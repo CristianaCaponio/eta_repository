@@ -1,8 +1,8 @@
-ARG PYTHON_VERSION=3.8.5-slim
+ARG PYTHON_VERSION=3.12
 FROM python:${PYTHON_VERSION} as runner-image
 
 
-ARG POETRY_VERSION=1.2.0
+ARG POETRY_VERSION=1.8.3
 # python
 ENV PYTHONUNBUFFERED=1 \
     # prevents python creating .pyc files
@@ -34,4 +34,4 @@ COPY . .
 RUN poetry install
 
 FROM test-image as main-image
-CMD ["poetry", "run", "python", "path_to_main"]
+CMD ["poetry", "run", "python", "eta_to_notification_develop/main.py"]

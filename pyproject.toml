@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "eta-to-notification"
+version = "0.1.0"
+description = "this project calculates the ETA and sends an email when the ETA reaches a certain time treshold"
+authors = ["CristianaCaponio <cristiana.caponio@ngs-sensors.it>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.111.0"
+uvicorn = "^0.30.1"
+loguru = "^0.7.2"
+pydantic = "^2.7.4"
+pydantic-settings = "^2.3.3"
+geopy = "^2.4.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
