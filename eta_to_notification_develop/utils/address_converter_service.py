@@ -1,29 +1,30 @@
 from typing import List, Tuple
 from geopy.geocoders import Nominatim
+from model.geopy_input_data import GeopyInputData
 from geopy.extra.rate_limiter import RateLimiter
-from model.input_data import InputData
-from fastapi import APIRouter,HTTPException, status
 from loguru import logger
 
 class AddressConverter:
     
     @staticmethod
-    def address_to_coordinates_converter(addresses: List[InputData]) -> List[Tuple[float, float]]:
+    def address_to_coordinates_converter(addresses_list: List[(GeopyInputData)]):
 
         geolocator = Nominatim(user_agent = 'my_request')
         geocode = RateLimiter(geolocator.geocode,min_delay_seconds = 1)
         coordinates_list = []
-
-        try:
-            for data in addresses:
-                location = geolocator.geocode(data.address)
-                if location:
-                    coordinates = (location.latitude, location.longitude)
-                    coordinates_list.append(coordinates)
-                else:
-                    logger.warning(f"Could not geocode address: {data.address}")
-        except Exception as ex:
-            logger.error(f"An error occurred: {ex}")
+        
+        
+        for data in addresses_list:
+            
+            full_address = f"{data.address}, {data.city}, {data.postal_code}"
+            location = geolocator.geocode(full_address)   
+                  
+            if location is not None:       
+                coordinates = (location.latitude, location.longitude)
+                coordinates_list.append(coordinates)
+                
+            else:           
+                logger.error(f"a non existent address was added : {full_address}")
 
         return coordinates_list
 
