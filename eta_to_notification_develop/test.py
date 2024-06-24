@@ -4,13 +4,23 @@ from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 from loguru import logger
 
-loc = ['ndsknsdonpsdnmondsoinfpidodsnoinfopioi'] #bastano via e città 
+'''file to make test before building a new container'''
+
+loc = ['Via Lioce Bari', 'Torino porta nuova' ] #bastano via e città 
 geolocator = Nominatim(user_agent="my_request")
-geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
+geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1, max_retries = 0)
 
 for x in loc:
-    location = geolocator.geocode(x)
+    coordinates = geolocator.geocode(x)
     print("-------------------------------------")
-    print(location)
-    print((location.latitude, location.longitude, location.raw))
-    print("-------------------------------------")
+    print(loc)
+    print((coordinates.latitude, coordinates.longitude))
+    print("-------------------------------------")        
+    
+    
+     
+    addresses = geolocator.reverse((coordinates.latitude, coordinates.longitude))
+    print(coordinates)
+    print(addresses)
+    
+   
