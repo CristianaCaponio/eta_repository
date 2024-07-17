@@ -1,24 +1,34 @@
-from typing import List, Tuple
+from typing import List
+import os
+#from dotenv import load_dotenv
+from io import StringIO
 from geopy.geocoders import Nominatim
 from model.geopy_input_data import GeopyInputData
 from geopy.extra.rate_limiter import RateLimiter
-from geopy.exc import GeocoderServiceError
 from loguru import logger
+
 
 class AddressConverter:
     
+    
     @staticmethod
-    def address_to_coordinates_converter(addresses_list: List[(GeopyInputData)]) -> List[tuple]:
+    def address_to_coordinates_converter(addresses_list: List[GeopyInputData]) -> str:
+        
         
         """
-        function to convert addresses to geographical coordinates
+        this function converts addresses into geographical coordinates and
+        creates a single string with all coordinates to mach TomTom's parameter
+        'location' that is a string with the following structure
+        52.50931,13.42936:52.50274,13.43872:52.50945,13.42988 
 
         Parameters
         ----------
         list of GeopyInputData objects converted into a string
         """
-
-        geolocator = Nominatim(user_agent = 'my_request')
+        #load_dotenv()
+        request = os.environ.get("USER_AGENT","my_agent") 
+        logger.info(request)       
+        geolocator = Nominatim(user_agent = request)
         geocode = RateLimiter(geolocator.geocode,min_delay_seconds = 1,  max_retries = 0)
         coordinates_list = []
         
@@ -35,34 +45,16 @@ class AddressConverter:
             else:           
                 logger.error(f"a non existent address was added : {full_address}")
 
-        return coordinates_list
-
-    @staticmethod                        
-    def coordinates_to_address_converter(coordinates_list: List[Tuple[float, float]])-> List[str]:
-        """
-        function for reversing geofence
-
-        Parameters
-        ----------
-        list of float tuple coming from coordinates converted by the function address_to_coordinates_converter
-        """
+        
+        if not coordinates_list:
+            raise ValueError("No valid coordinates found.")
     
-        geolocator = Nominatim(user_agent = 'my_request')
-        geocode = RateLimiter(geolocator.geocode, min_delay_seconds = 1,  max_retries = 0)
-        addresses_list = []
-    
-        for coordinates in coordinates_list:            
-            
-            location = geolocator.reverse(f"{coordinates[0]}, {coordinates[1]}")            
-                
-            if location is not None:    
-               
-                address =  location.address
-                addresses_list.append(address)
-                
-            else:           
-                logger.error(f"an error occurred : {coordinates}")
+        full_coordinates_list = StringIO()
+        full_coordinates_list.write(f"{coordinates_list[0][0]},{coordinates_list[0][1]}")
+        
+        for single_coordinate in coordinates_list[1:]:
+            full_coordinates_list.write(f":{single_coordinate[0]},{single_coordinate[1]}")
 
-        return addresses_list
-    
-
+                    
+        return full_coordinates_list.getvalue()
+   

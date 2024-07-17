@@ -13,7 +13,7 @@ services:
     #   - default
     ports:
       - "8010:8010"
-    #env_file: ./device_management.env
+    env_file: ./eta_to_notification.env
     #network_mode: host
 
 # networks: 
