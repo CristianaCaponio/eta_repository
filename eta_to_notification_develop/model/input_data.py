@@ -2,7 +2,6 @@ from typing import List, Optional
 from model.geopy_input_data import GeopyInputData
 from pydantic import BaseModel
 
-
 class InputData(BaseModel):
     
     '''model for input data into the API'''
@@ -11,6 +10,4 @@ class InputData(BaseModel):
     routeType : str   
     travelMode : str
     departAt : str
-    computeBestOrder : bool
-    
-    
+    computeBestOrder : bool   

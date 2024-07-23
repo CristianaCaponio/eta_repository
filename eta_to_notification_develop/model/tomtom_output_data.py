@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from typing import List
 
+"""model to create the TomTom output json"""
+
 class RouteSummary(BaseModel):
     lengthInMeters: int
     travelTimeInSeconds: int
