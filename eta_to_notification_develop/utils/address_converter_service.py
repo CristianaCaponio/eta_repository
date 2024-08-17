@@ -1,6 +1,5 @@
 from typing import List
 import os
-#from dotenv import load_dotenv
 from io import StringIO
 from geopy.geocoders import Nominatim
 from model.geopy_input_data import GeopyInputData
@@ -15,36 +14,39 @@ class AddressConverter:
     def address_to_coordinates_converter(addresses_list: List[GeopyInputData]) -> str:
         
         
-        """
-        this function converts addresses into geographical coordinates and
-        creates a single string with all coordinates to mach TomTom's parameter
-        'location' that is a string with the following structure
-        52.50931,13.42936:52.50274,13.43872:52.50945,13.42988 
+        """         
+        Converts a list of addresses into a single string of geographical coordinates.
 
         Parameters
         ----------
-        list of GeopyInputData objects converted into a string
+        addresses_list : List[GeopyInputData]
+            A list of GeopyInputData objects containing address details.
+
+        Returns
+        -------
+        str
+            A string of geographical coordinates in the format 'lat1,lon1:lat2,lon2:...'.
+
         """
-        #load_dotenv()
         request = os.environ.get("USER_AGENT","my_agent") 
         logger.info(request)       
         geolocator = Nominatim(user_agent = request)
         geocode = RateLimiter(geolocator.geocode,min_delay_seconds = 1,  max_retries = 0)
         coordinates_list = []
-        
-        
+                
         for data in addresses_list:
             
-            full_address = f"{data.address}, {data.house_number}, {data.city}"
-            location = geolocator.geocode(full_address)   
-                  
-            if location is not None:       
-                coordinates = (location.latitude, location.longitude)
-                coordinates_list.append(coordinates)
-                
-            else:           
-                logger.error(f"a non existent address was added : {full_address}")
+            try:
+                full_address = f"{data.address}, {data.house_number}, {data.city}, {data.district}, {data.zip_code}"
+                location = geolocator.geocode(full_address)
 
+                if location is not None:
+                    coordinates = (location.latitude, location.longitude)
+                    coordinates_list.append(coordinates)
+                else:
+                    logger.error(f"A non-existent address was added: {full_address}")
+            except Exception as e:
+                logger.error(f"Error geocoding address {full_address}: {e}")
         
         if not coordinates_list:
             raise ValueError("No valid coordinates found.")

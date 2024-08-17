@@ -8,24 +8,25 @@ class RouteSummary(BaseModel):
     travelTimeInSeconds: int
     trafficDelayInSeconds: int
     trafficLengthInMeters: int
+    startAddress: str
+    endAddress: str 
     departureTime: str
     arrivalTime: str
 
-class Point(BaseModel):
-    latitude: float
-    longitude: float
 
 class LegSummary(BaseModel):
     lengthInMeters: int
     travelTimeInSeconds: int
     trafficDelayInSeconds: int
     trafficLengthInMeters: int
+    departureAddress: str 
+    arrivalAddress: str 
     departureTime: str
     arrivalTime: str
 
 class Leg(BaseModel):
     summary: LegSummary
-    points: List[Point]
+    #points: List[Point]
 
 class Section(BaseModel):
     startPointIndex: int

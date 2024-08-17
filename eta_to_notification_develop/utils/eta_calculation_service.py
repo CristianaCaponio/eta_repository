@@ -1,7 +1,9 @@
+from typing import Dict
 import requests
+from model.input_data import InputData
 from utils.address_converter_service import AddressConverter
 from model.input_data import InputData
-from model.tomtom_output_data import TomTomResponse, RouteSummary, Point, LegSummary, Leg, Section, Route
+from model.tomtom_output_data import TomTomResponse, RouteSummary, LegSummary, Leg, Section, Route 
 from datetime import datetime, timedelta
 from loguru import logger
 import os
@@ -17,19 +19,21 @@ class TomTomParams:
         return (
             location_str
             + "/json?routeType=" + input_data.routeType           
-            + "&travelMode=" + input_data.travelMode
-            + "&computeBestOrder=" + str(input_data.computeBestOrder).lower()
+            + "&travelMode=" + input_data.travelMode          
+            + "&routeRepresentation=" + str(input_data.routeRepresentation)
             + "&departAt=" + urlparse.quote(input_data.departAt)
         )        
         
     
     @staticmethod
-    def tomtom_request(request_params: str) -> TomTomResponse:
+    def tomtom_request(request_params: str, input_data: InputData) -> TomTomResponse:
         """This method receives a query parameter string (obtained from the request_params method), appends it to the base URL and adds the API key.
             It constructs the complete URL for making the request to the TomTom API and retrieves information from the service."""
         baseUrl = "https://api.tomtom.com/routing/1/calculateRoute/" 
-        API_KEY = os.getenv("TOMTOM_API_KEY")
-        logger.info(API_KEY)    
+        API_KEY = os.getenv("TOMTOM_API_KEY")           
+        if not API_KEY:
+            raise ValueError("TOMTOM_API_KEY environment variable is not set.")
+
             
         if not API_KEY:
             raise ValueError("TOMTOM_API_KEY environment variable is not set.")
@@ -44,6 +48,12 @@ class TomTomParams:
         if response.status_code == 200:
             # Get response's JSON
             jsonResult = response.json()
+            
+            #create the parameters for the first and the last addresses
+            start_address = input_data.location[0]
+            logger.info(input_data.location[0])
+            end_address = input_data.location[-1]
+            logger.info(input_data.location[-1])
 
             # Construct the RouteSummary
             route_summary = RouteSummary(
@@ -51,35 +61,40 @@ class TomTomParams:
                 travelTimeInSeconds=jsonResult['routes'][0]['summary']['travelTimeInSeconds'],
                 trafficDelayInSeconds=jsonResult['routes'][0]['summary']['trafficDelayInSeconds'],
                 trafficLengthInMeters=jsonResult['routes'][0]['summary']['trafficLengthInMeters'],
+                startAddress=f"{start_address.address}, {start_address.house_number}, {start_address.city}, {start_address.district}, {start_address.zip_code}",
+                endAddress=f"{end_address.address}, {end_address.house_number}, {end_address.city}, {end_address.district}, {end_address.zip_code}",
                 departureTime=jsonResult['routes'][0]['summary']['departureTime'],
                 arrivalTime=jsonResult['routes'][0]['summary']['arrivalTime']
             )
             # Construct the Legs
             legs = []
+            i = 0
             for leg_data in jsonResult['routes'][0]['legs']:
+                
+                #create the parameters the departure and the arrival of every leg
+                departure_address = input_data.location[i]
+                arrival_address = input_data.location[i + 1]
+                
                 leg_summary = LegSummary(
                     lengthInMeters=leg_data['summary']['lengthInMeters'],
                     travelTimeInSeconds=leg_data['summary']['travelTimeInSeconds'],
                     trafficDelayInSeconds=leg_data['summary']['trafficDelayInSeconds'],
+                    departureAddress= f"{departure_address.address}, {departure_address.house_number},{departure_address.city}, {departure_address.district}, {departure_address.zip_code}",
+                    arrivalAddress= f"{arrival_address.address}, {arrival_address.house_number}, {arrival_address.city}, {arrival_address.district}, {arrival_address.zip_code}",
                     trafficLengthInMeters=leg_data['summary']['trafficLengthInMeters'],
                     departureTime=leg_data['summary']['departureTime'],
                     arrivalTime=leg_data['summary']['arrivalTime'],
                     originalWaypointIndexAtEndOfLeg=leg_data['summary'].get('originalWaypointIndexAtEndOfLeg', 0)
                 )                
                
-                # Include only the first and last points
-                points = []
-                if leg_data['points']:
-                    points.append(Point(latitude=leg_data['points'][0]['latitude'], longitude=leg_data['points'][0]['longitude']))
-                    if len(leg_data['points']) > 1:
-                        points.append(Point(latitude=leg_data['points'][-1]['latitude'], longitude=leg_data['points'][-1]['longitude']))
-                                            
+                                                         
                 leg = Leg(
                     summary=leg_summary,
-                    points=points
+                    
                 )
                 legs.append(leg)
-
+                i= i + 1
+                
             # Construct the Sections
             sections = [
                 Section(
@@ -123,22 +138,49 @@ class TomTomParams:
         new_time_obj = time_obj + timedelta(seconds=delay_in_seconds)
         return new_time_obj.strftime(time_format)
         
+    
     @staticmethod
-    def calculate_definitive_eta(response: TomTomResponse, cap_delays: list[int]) -> TomTomResponse:
+    def calculate_definitive_eta(response: TomTomResponse, zip_code_delays: Dict[str, int]) -> TomTomResponse:
         """This method takes a TomTomResponse object and a list of cap delays to update the travelTimeInSeconds variable. 
             It adjusts travel times and arrival/departure times based on the accumulated delays.""" 
-        for route in response.routes:
-            total_delay = 0
-            for i, leg in enumerate(route.legs):                
-                total_delay += cap_delays[i]
-                leg.summary.travelTimeInSeconds += total_delay
-                leg.summary.arrivalTime = TomTomParams.add_delay_to_time(leg.summary.arrivalTime, total_delay)               
-               
-                if i < len(route.legs) - 1:
-                    next_leg = route.legs[i + 1]
-                    next_leg.summary.departureTime = TomTomParams.add_delay_to_time(next_leg.summary.departureTime, total_delay)
-                    
-            route.summary.travelTimeInSeconds += total_delay
-            route.summary.arrivalTime = TomTomParams.add_delay_to_time(route.summary.arrivalTime, total_delay)
         
+        logger.debug("Starting definitive ETA calculation.")
+
+        for route in response.routes:
+            logger.info(f"Processing the route: {route.summary.startAddress} a {route.summary.endAddress}")
+            total_delay = 0
+            previous_zip_code = None        
+            
+            for leg in route.legs:
+                # extracting the departure zip_code from the address
+                zip_code = leg.summary.departureAddress.split(',')[-1].strip()
+                logger.info(f"departure zip_code: {zip_code}")
+                
+                # checking if the next zip_code is different from the previous one
+                if zip_code != previous_zip_code:
+                    # recovering the zip_code delay
+                    delay = zip_code_delays.get(zip_code, 0)
+                    logger.info(f"delay for zip_code {zip_code}: {delay} seconds")
+                
+                    # adding delay to time
+                    leg.summary.travelTimeInSeconds += delay
+                    total_delay += delay
+                
+                    # updating the time of arrival
+                    leg.summary.arrivalTime = TomTomParams.add_delay_to_time(leg.summary.departureTime, leg.summary.travelTimeInSeconds)
+                
+                #updating the previous zip-code
+                previous_zip_code = zip_code  
+                
+                logger.info(f"Update: time of travel: {leg.summary.travelTimeInSeconds} seconds, "
+                            f"time of arrival: {leg.summary.arrivalTime}")
+
+            # updating the travel time
+            route.summary.travelTimeInSeconds += total_delay
+            route.summary.arrivalTime = TomTomParams.add_delay_to_time(route.summary.departureTime, route.summary.travelTimeInSeconds)
+            
+            logger.info(f"Update: Total time travel: {route.summary.travelTimeInSeconds} seconds, "
+                        f"Arrival time: {route.summary.arrivalTime}")
+        
+        logger.info("Definitive ETA calculatioon completed.")
         return response
