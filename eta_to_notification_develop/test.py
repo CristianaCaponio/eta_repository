@@ -1,26 +1,20 @@
-from typing import List
-from geopy.geocoders import Nominatim
-#from model.input_data import InputData
-from geopy.extra.rate_limiter import RateLimiter
-from loguru import logger
+from mongoengine import connect
 
-'''file to make test before building a new container'''
+client = connect(
+    db='followtruck',
+    username='root',
+    password='1234',
+    host='mongodb://root:1234@localhost/followtruck'
+)
 
-loc = ['Via Lioce Bari', 'Torino porta nuova' ] #bastano via e città 
-geolocator = Nominatim(user_agent="my_request")
-geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1, max_retries = 0)
-
-for x in loc:
-    coordinates = geolocator.geocode(x)
-    print("-------------------------------------")
-    print(loc)
-    print((coordinates.latitude, coordinates.longitude))
-    print("-------------------------------------")        
-    
-    
-     
-    addresses = geolocator.reverse((coordinates.latitude, coordinates.longitude))
-    print(coordinates)
-    print(addresses)
+def db_connect():
+    #connecting to a DB in mongoDB
+    try:
+        if client.get_database('followtruck'):
+            print("Connection Successful!")
+            return True
+    except:
+        print("Please check your connection")
+        return False
     
    

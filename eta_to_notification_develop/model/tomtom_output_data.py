@@ -13,7 +13,6 @@ class RouteSummary(BaseModel):
     departureTime: str
     arrivalTime: str
 
-
 class LegSummary(BaseModel):
     lengthInMeters: int
     travelTimeInSeconds: int
@@ -26,19 +25,11 @@ class LegSummary(BaseModel):
 
 class Leg(BaseModel):
     summary: LegSummary
-    #points: List[Point]
-
-class Section(BaseModel):
-    startPointIndex: int
-    endPointIndex: int
-    sectionType: str
-    travelMode: str
-
+    
 class Route(BaseModel):
     summary: RouteSummary
     legs: List[Leg]
-    sections: List[Section]
-
+   
 class TomTomResponse(BaseModel):
     formatVersion: str
     routes: List[Route]

@@ -3,7 +3,7 @@ import requests
 from model.input_data import InputData
 from utils.address_converter_service import AddressConverter
 from model.input_data import InputData
-from model.tomtom_output_data import TomTomResponse, RouteSummary, LegSummary, Leg, Section, Route 
+from model.tomtom_output_data import TomTomResponse, RouteSummary, LegSummary, Leg, Route 
 from datetime import datetime, timedelta
 from loguru import logger
 import os
@@ -93,36 +93,20 @@ class TomTomParams:
                     
                 )
                 legs.append(leg)
-                i= i + 1
-                
-            # Construct the Sections
-            sections = [
-                Section(
-                    startPointIndex=section['startPointIndex'],
-                    endPointIndex=section['endPointIndex'],
-                    sectionType=section['sectionType'],
-                    travelMode=section['travelMode']
-                )
-                for section in jsonResult['routes'][0]['sections']
-            ]
-
+                i= i + 1                
+           
             # Construct the Route
             route = Route(
                 summary=route_summary,
-                legs=legs,
-                sections=sections
+                legs=legs,                
             )
-
-            # Construct the optimized waypoints
-            optimized_waypoints = jsonResult.get('optimizedWaypoints', [])
-
+           
             # Construct the TomTomResponse
             tomtom_response = TomTomResponse(
                 formatVersion="0.0.12",
                 routes=[route],
-                optimizedWaypoints=optimized_waypoints
+                
             )         
-
           
             return tomtom_response
 
