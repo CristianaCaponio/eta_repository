@@ -12,7 +12,7 @@ eta_api_router = APIRouter(tags=["Eta-To-Notification"])
 
 app = FastAPI()
 
-# Established connection to MongoDB when app starts
+#Established connection to MongoDB when app starts
 @app.on_event("startup")
 def startup_db():
     db_connect()  

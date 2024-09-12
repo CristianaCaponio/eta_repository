@@ -7,8 +7,9 @@ class InputData(BaseModel):
     
     '''model for input data into the API'''
         
-    location : Optional[List[GeopyInputData]]
-    routeType : str   
-    travelMode : str
-    departAt : str      
-    routeRepresentation : str
+    location: Optional[List[GeopyInputData]]
+    routeType: str   
+    travelMode: str
+    departAt: str      
+    routeRepresentation: str
+    ordered: str

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 """model to create the TomTom output json"""
 
@@ -8,8 +8,8 @@ class RouteSummary(BaseModel):
     travelTimeInSeconds: int
     trafficDelayInSeconds: int
     trafficLengthInMeters: int
-    startAddress: str
-    endAddress: str 
+    startAddress: Optional[str] 
+    endAddress: Optional[str] 
     departureTime: str
     arrivalTime: str
 
@@ -18,8 +18,8 @@ class LegSummary(BaseModel):
     travelTimeInSeconds: int
     trafficDelayInSeconds: int
     trafficLengthInMeters: int
-    departureAddress: str 
-    arrivalAddress: str 
+    departureAddress: Optional[str] 
+    arrivalAddress: Optional[str]  
     departureTime: str
     arrivalTime: str
 

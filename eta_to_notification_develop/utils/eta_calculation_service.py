@@ -2,7 +2,6 @@ from typing import Dict
 import requests
 from model.input_data import InputData
 from utils.address_converter_service import AddressConverter
-from model.input_data import InputData
 from model.tomtom_output_data import TomTomResponse, RouteSummary, LegSummary, Leg, Route 
 from datetime import datetime, timedelta
 from loguru import logger
@@ -22,22 +21,21 @@ class TomTomParams:
             + "&travelMode=" + input_data.travelMode          
             + "&routeRepresentation=" + str(input_data.routeRepresentation)
             + "&departAt=" + urlparse.quote(input_data.departAt)
-        )        
-        
+            + "&computeBestOrder=" + str(input_data.ordered)
+        ) 
+             
     
     @staticmethod
     def tomtom_request(request_params: str, input_data: InputData) -> TomTomResponse:
         """This method receives a query parameter string (obtained from the request_params method), appends it to the base URL and adds the API key.
             It constructs the complete URL for making the request to the TomTom API and retrieves information from the service."""
+        
         baseUrl = "https://api.tomtom.com/routing/1/calculateRoute/" 
         API_KEY = os.getenv("TOMTOM_API_KEY")           
         if not API_KEY:
             raise ValueError("TOMTOM_API_KEY environment variable is not set.")
-
             
-        if not API_KEY:
-            raise ValueError("TOMTOM_API_KEY environment variable is not set.")
-                 
+                         
         requestUrl = baseUrl + request_params + "&key=" + API_KEY
         logger.info("Request URL: " + requestUrl + "\n")        
        
@@ -49,70 +47,64 @@ class TomTomParams:
             # Get response's JSON
             jsonResult = response.json()
             
-            #create the parameters for the first and the last addresses
-            start_address = input_data.location[0]
-            logger.info(input_data.location[0])
-            end_address = input_data.location[-1]
-            logger.info(input_data.location[-1])
-
-            # Construct the RouteSummary
+            # Create a common RouteSummary object
             route_summary = RouteSummary(
-                lengthInMeters=jsonResult['routes'][0]['summary']['lengthInMeters'],
-                travelTimeInSeconds=jsonResult['routes'][0]['summary']['travelTimeInSeconds'],
-                trafficDelayInSeconds=jsonResult['routes'][0]['summary']['trafficDelayInSeconds'],
-                trafficLengthInMeters=jsonResult['routes'][0]['summary']['trafficLengthInMeters'],
-                startAddress=f"{start_address.address}, {start_address.house_number}, {start_address.city}, {start_address.district}, {start_address.zip_code}",
-                endAddress=f"{end_address.address}, {end_address.house_number}, {end_address.city}, {end_address.district}, {end_address.zip_code}",
-                departureTime=jsonResult['routes'][0]['summary']['departureTime'],
-                arrivalTime=jsonResult['routes'][0]['summary']['arrivalTime']
+                lengthInMeters=jsonResult['routes'][0]['summary'].get('lengthInMeters'),
+                travelTimeInSeconds=jsonResult['routes'][0]['summary'].get('travelTimeInSeconds'),
+                trafficDelayInSeconds=jsonResult['routes'][0]['summary'].get('trafficDelayInSeconds'),
+                trafficLengthInMeters=jsonResult['routes'][0]['summary'].get('trafficLengthInMeters'),
+                departureTime=jsonResult['routes'][0]['summary'].get('departureTime'),
+                arrivalTime=jsonResult['routes'][0]['summary'].get('arrivalTime')
             )
-            # Construct the Legs
-            legs = []
-            i = 0
-            for leg_data in jsonResult['routes'][0]['legs']:
-                
-                #create the parameters the departure and the arrival of every leg
-                departure_address = input_data.location[i]
-                arrival_address = input_data.location[i + 1]
-                
-                leg_summary = LegSummary(
-                    lengthInMeters=leg_data['summary']['lengthInMeters'],
-                    travelTimeInSeconds=leg_data['summary']['travelTimeInSeconds'],
-                    trafficDelayInSeconds=leg_data['summary']['trafficDelayInSeconds'],
-                    departureAddress= f"{departure_address.address}, {departure_address.house_number},{departure_address.city}, {departure_address.district}, {departure_address.zip_code}",
-                    arrivalAddress= f"{arrival_address.address}, {arrival_address.house_number}, {arrival_address.city}, {arrival_address.district}, {arrival_address.zip_code}",
-                    trafficLengthInMeters=leg_data['summary']['trafficLengthInMeters'],
-                    departureTime=leg_data['summary']['departureTime'],
-                    arrivalTime=leg_data['summary']['arrivalTime'],
-                    originalWaypointIndexAtEndOfLeg=leg_data['summary'].get('originalWaypointIndexAtEndOfLeg', 0)
-                )                
-               
-                                                         
-                leg = Leg(
-                    summary=leg_summary,
-                    
-                )
-                legs.append(leg)
-                i= i + 1                
-           
-            # Construct the Route
-            route = Route(
-                summary=route_summary,
-                legs=legs,                
-            )
-           
-            # Construct the TomTomResponse
-            tomtom_response = TomTomResponse(
-                formatVersion="0.0.12",
-                routes=[route],
-                
-            )         
-          
-            return tomtom_response
 
+            # Add start and end addresses if ordered is False
+            if input_data.ordered == 'false':
+                start_address = input_data.location[0]
+                end_address = input_data.location[-1]
+                route_summary.startAddress = (
+                    f"{start_address.address}, {start_address.house_number}, {start_address.city}, "
+                    f"{start_address.district}, {start_address.zip_code}"
+                )
+                route_summary.endAddress = (
+                    f"{end_address.address}, {end_address.house_number}, {end_address.city}, "
+                    f"{end_address.district}, {end_address.zip_code}"
+                )
+
+            legs = []
+            for i, leg_data in enumerate(jsonResult['routes'][0]['legs']):
+                leg_summary = LegSummary(
+                    lengthInMeters=leg_data['summary'].get('lengthInMeters'),
+                    travelTimeInSeconds=leg_data['summary'].get('travelTimeInSeconds'),
+                    trafficDelayInSeconds=leg_data['summary'].get('trafficDelayInSeconds'),
+                    trafficLengthInMeters=leg_data['summary'].get('trafficLengthInMeters'),
+                    departureTime=leg_data['summary'].get('departureTime'),
+                    arrivalTime=leg_data['summary'].get('arrivalTime'),
+                    originalWaypointIndexAtEndOfLeg=leg_data['summary'].get('originalWaypointIndexAtEndOfLeg', 0)
+                )
+
+                # Add departure and arrival addresses if ordered is False
+                if input_data.ordered == 'false':
+                    departure_address = input_data.location[i]
+                    arrival_address = input_data.location[i + 1]
+                    leg_summary.departureAddress = (
+                        f"{departure_address.address}, {departure_address.house_number}, "
+                        f"{departure_address.city}, {departure_address.district}, {departure_address.zip_code}"
+                    )
+                    leg_summary.arrivalAddress = (
+                        f"{arrival_address.address}, {arrival_address.house_number}, "
+                        f"{arrival_address.city}, {arrival_address.district}, {arrival_address.zip_code}"
+                    )
+
+                legs.append(Leg(summary=leg_summary))
+
+            # Create Route and TomTomResponse objects
+            route = Route(summary=route_summary, legs=legs)
+            tomtom_response = TomTomResponse(formatVersion="0.0.12", routes=[route])
+            
+            return tomtom_response
         else:
             raise ValueError(f"Request failed with status code: {response.status_code}")
-    
+        
     @staticmethod    
     def add_delay_to_time(time_str: str, delay_in_seconds: int) -> str:
         """This method takes an ISO-format time string and a delay in seconds. It converts the time string to a datetime object, 
