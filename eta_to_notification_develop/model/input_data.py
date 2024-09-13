@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class InputData(BaseModel):
     
-    '''model for input data into the API'''
+    '''model for input data into the API. DepartAt value for real-time departing = now'''
         
     location: Optional[List[GeopyInputData]]
     routeType: str   
