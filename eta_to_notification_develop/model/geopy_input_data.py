@@ -8,5 +8,5 @@ class GeopyInputData(BaseModel):
     address : str
     city : str
     district : str
-    house_number : str
-    zip_code : str
+    house_number : int
+    zip_code : int

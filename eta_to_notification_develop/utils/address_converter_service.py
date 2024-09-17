@@ -59,4 +59,3 @@ class AddressConverter:
 
                     
         return full_coordinates_list.getvalue()
-   
