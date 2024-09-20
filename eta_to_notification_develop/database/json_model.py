@@ -1,5 +1,3 @@
-from mongoengine import Document, EmbeddedDocument, StringField, IntField, ListField, EmbeddedDocumentField, DateTimeField
-
 from mongoengine import Document, DictField
 
 class JsonCollectionTest(Document):

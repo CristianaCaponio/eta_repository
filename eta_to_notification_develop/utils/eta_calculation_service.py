@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 from typing import Dict
 import requests
 from model.input_data import InputData
@@ -20,9 +19,9 @@ class TomTomParams:
             location_str
             + "/json?routeType=" + input_data.routeType           
             + "&travelMode=" + input_data.travelMode          
-            + "&routeRepresentation=" + str(input_data.routeRepresentation)
+            + "&routeRepresentation=polyline" #+ str(input_data.routeRepresentation)
             + "&departAt=" + urlparse.quote(input_data.departAt)
-            + "&computeBestOrder=" + str(input_data.ordered)
+            + "&computeBestOrder=true" #+ str(input_data.ordered)
         ) 
              
     
@@ -48,23 +47,13 @@ class TomTomParams:
             # Get response's JSON
             jsonResult = response.json()            
             
-            if input_data.ordered == 'true' and input_data.routeRepresentation == 'polyline':
-                # takes the first and the last coordinates  ('points') of the leg array in class Route
-                departure_coords = jsonResult['routes'][0]['legs'][0]['points'][0]
-                arrival_coords = jsonResult['routes'][0]['legs'][-1]['points'][-1]
-                start_address = f"{departure_coords['latitude']}, {departure_coords['longitude']}"
-                end_address = f"{arrival_coords['latitude']}, {arrival_coords['longitude']}"
-            elif input_data.ordered == 'false' and input_data.routeRepresentation == 'summaryOnly':
-                # takes the first and the last address of the array locations 
-                start_location = input_data.location[0]
-                end_location = input_data.location[-1]
-                start_address = f"{start_location.address}, {start_location.house_number}, {start_location.city}, {start_location.district}, {start_location.zip_code}"
-                end_address = f"{end_location.address}, {end_location.house_number}, {end_location.city}, {end_location.district}, {end_location.zip_code}"
-            else:
-                 raise HTTPException(
-                    status_code=400,
-                    detail="Wrong parameters combination. The right combination is: computeBestOrder = true and routeRepresentation = polyline or computeBestOrder = false and routeRepresentation = summaryOnly"
-                )
+            
+            # taking the first and the last coordinates  ('points') of the leg array in class Route
+            departure_coords = jsonResult['routes'][0]['legs'][0]['points'][0]
+            arrival_coords = jsonResult['routes'][0]['legs'][-1]['points'][-1]
+            start_address = f"{departure_coords['latitude']}, {departure_coords['longitude']}"
+            end_address = f"{arrival_coords['latitude']}, {arrival_coords['longitude']}"
+            
             # Construct the RouteSummary
             route_summary = RouteSummary(
                 lengthInMeters=jsonResult['routes'][0]['summary']['lengthInMeters'],
@@ -79,25 +68,14 @@ class TomTomParams:
             # Construct the Legs
             legs = []
             i = 0
-            for leg_data in jsonResult['routes'][0]['legs']:                
-                 
-                if input_data.ordered == 'true' and input_data.routeRepresentation == 'polyline':
-                    departure_coords = leg_data['points'][0]
-                    arrival_coords = leg_data['points'][-1]
-                    departure_address = f"{departure_coords['latitude']}, {departure_coords['longitude']}"
-                    arrival_address = f"{arrival_coords['latitude']}, {arrival_coords['longitude']}"
-                elif input_data.ordered == 'false' and input_data.routeRepresentation == 'summaryOnly':
-                    # Usa gli indirizzi se ordered == 'false' o routeRepresentation == 'summaryOnly'
-                    departure_address = input_data.location[i]
-                    arrival_address = input_data.location[i + 1]
-                    departure_address = f"{departure_address.address}, {departure_address.house_number},{departure_address.city}, {departure_address.district}, {departure_address.zip_code}"
-                    arrival_address = f"{arrival_address.address}, {arrival_address.house_number}, {arrival_address.city}, {arrival_address.district}, {arrival_address.zip_code}"
-                else:
-                    raise HTTPException(
-                    status_code=400,
-                    detail="Wrong parameters combination. The right combination is: computeBestOrder = true and routeRepresentation = polyline or computeBestOrder = false and routeRepresentation = summaryOnly"
-                )
-                
+            for leg_data in jsonResult['routes'][0]['legs']:           
+                                
+                departure_coords = leg_data['points'][0]
+                arrival_coords = leg_data['points'][-1]
+                departure_address = f"{departure_coords['latitude']}, {departure_coords['longitude']}"
+                arrival_address = f"{arrival_coords['latitude']}, {arrival_coords['longitude']}"
+               
+               
                 leg_summary = LegSummary(
                     lengthInMeters=leg_data['summary']['lengthInMeters'],
                     travelTimeInSeconds=leg_data['summary']['travelTimeInSeconds'],
@@ -107,7 +85,6 @@ class TomTomParams:
                     trafficLengthInMeters=leg_data['summary']['trafficLengthInMeters'],
                     departureTime=leg_data['summary']['departureTime'],
                     arrivalTime=leg_data['summary']['arrivalTime'],
-                    originalWaypointIndexAtEndOfLeg=leg_data['summary'].get('originalWaypointIndexAtEndOfLeg', 0)
                 )            
                                                                         
                 leg = Leg(
@@ -153,8 +130,10 @@ class TomTomParams:
 
         for route in response.routes:
             logger.info(f"Processing the route: {route.summary.startAddress} a {route.summary.endAddress}")
-            total_delay = 0
+            total_delay = 0     
             previous_zip_code = None        
+            
+           
             
             for leg in route.legs:
                 # extracting the departure zip_code from the address
@@ -173,10 +152,10 @@ class TomTomParams:
                 
                     # updating the time of arrival
                     leg.summary.arrivalTime = TomTomParams.add_delay_to_time(leg.summary.departureTime, leg.summary.travelTimeInSeconds)
-                
+                                 
                 #updating the previous zip-code
                 previous_zip_code = zip_code  
-                
+
                 logger.info(f"Update: time of travel: {leg.summary.travelTimeInSeconds} seconds, "
                             f"time of arrival: {leg.summary.arrivalTime}")
 

@@ -11,5 +11,5 @@ class InputData(BaseModel):
     routeType: str   
     travelMode: str
     departAt: str      
-    routeRepresentation: str
-    ordered: str
+    # routeRepresentation: str
+    # ordered: str
