@@ -1,17 +1,53 @@
 {
   "personal_id": "banana",
   "summary": {
-    "startAddress": "Piazza Vittorio Emanuele, 24, 55011, Altopascio, LU",
-    "endAddress": "Piazza San Bernardino da Siena, 1, 55041, Camaiore, LU"
+    "startAddress": {
+      "address": "Piazza Vittorio Emanuele",
+      "house_number": "24",
+      "city": "Altopascio",
+      "district": "LU",
+      "zip_code": "55011"
+    },
+    "endAddress": {
+      "address": "Piazza San Bernardino da Siena",
+      "house_number": "1",
+      "city": "Camaiore",
+      "district": "LU",
+      "zip_code": "55041"
+    }
   },
   "stops": [
     {
-      "departureAddress": "Piazza Vittorio Emanuele, 24, 55011, Altopascio, LU",
-      "arrivalAddress": "Via Umberto I, 103, 55022, Bagni di Lucca, LU"
+      "departureAddress": {
+        "address": "Piazza Vittorio Emanuele",
+        "house_number": "24",
+        "city": "Altopascio",
+        "district": "LU",
+        "zip_code": "55011"
+      },
+      "arrivalAddress": {
+        "address": "Via Umberto I",
+        "house_number": "103",
+        "city": "Bagni di Lucca",
+        "district": "LU",
+        "zip_code": "55022"
+      }
     },
     {
-      "departureAddress": "Via Umberto I, 1, 55023, Borgo a Mozzano, LU",
-      "arrivalAddress": "Piazza San Bernardino da Siena, 1, 55041, Camaiore, LU"
+      "departureAddress": {
+        "address": "Via Umberto I",
+        "house_number": "103",
+        "city": "Bagni di Lucca",
+        "district": "LU",
+        "zip_code": "55022"
+      },
+      "arrivalAddress": {
+        "address": "Piazza San Bernardino da Siena",
+        "house_number": "1",
+        "city": "Camaiore",
+        "district": "LU",
+        "zip_code": "55041"
+      }
     }
   ]
 }

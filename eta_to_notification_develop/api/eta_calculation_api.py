@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException, status
 from model.input_data import InputData
-from utils.eta_calculation_service import TomTomParams
+from utils.address_converter_service import AddressConverter
 from model.db_models import TravelData
 from loguru import logger
 import json
@@ -24,7 +24,7 @@ def startup_db():
 app.include_router(eta_api_router)
 
 
-@eta_api_router.post("/eta/calculation", response_model=TravelData)
+@eta_api_router.post("/eta/calculation", status_code=status.HTTP_201_CREATED)
 def eta_calculation(input_data: TravelData):
     try:
         # # Taking delays from JSON file
@@ -45,6 +45,31 @@ def eta_calculation(input_data: TravelData):
 
         # transforming the json object into a dictionary
         # final_response_dict = final_response.dict()
+
+        if input_data.summary.startLatitude is None:
+
+            start_coordinates = AddressConverter.address_to_coordinates_converter(
+                input_data.summary.startAddress)
+            input_data.summary.startLatitude = start_coordinates[0]
+            input_data.summary.startLongitude = start_coordinates[1]
+
+        if input_data.summary.endLatitude is None:
+            end_coordinates = AddressConverter.address_to_coordinates_converter(
+                input_data.summary.endAddress)
+            input_data.summary.endLatitude = end_coordinates[0]
+            input_data.summary.endLongitude = end_coordinates[1]
+
+        for stop in input_data.stops:
+            if stop.departureLatitude is None:
+                departure_coordinates = AddressConverter.address_to_coordinates_converter(
+                    stop.departureAddress)
+                stop.departureLatitude = departure_coordinates[0]
+                stop.departureLongitude = departure_coordinates[1]
+            if stop.arrivalLatitude is None:
+                arrival_coordinates = AddressConverter.address_to_coordinates_converter(
+                    stop.arrivalAddress)
+                stop.arrivalLatitude = arrival_coordinates[0]
+                stop.arrivalLongitude = arrival_coordinates[1]
 
         logger.info(input_data)
 

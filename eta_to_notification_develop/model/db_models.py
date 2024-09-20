@@ -37,11 +37,11 @@ class Summary(BaseModel):
     trafficDelayInSeconds: Optional[int] = 0
     trafficLengthInMeters: Optional[int] = 0
     startAddress: GeopyInputData
-    startLatitude: Optional[float]
-    startLongitude: Optional[float]
+    startLatitude: Optional[float] = None
+    startLongitude: Optional[float] = None
     endAddress:  GeopyInputData
-    endLatitude: float
-    endLongitude: float
+    endLatitude: Optional[float] = None
+    endLongitude: Optional[float] = None
     departureTime: Optional[str] = ""
     arrivalTime: Optional[str] = ""
 
@@ -53,11 +53,11 @@ class StopSummary(BaseModel):
     trafficDelayInSeconds: Optional[int] = 0
     trafficLengthInMeters: Optional[int] = 0
     departureAddress: GeopyInputData
-    departureLatitude: Optional[float]
-    departureLongitude: Optional[float]
+    departureLatitude: Optional[float] = None
+    departureLongitude: Optional[float] = None
     arrivalAddress: GeopyInputData
-    arrivalLatitude: Optional[float]
-    arrivalLongitude: Optional[float]
+    arrivalLatitude: Optional[float] = None
+    arrivalLongitude: Optional[float] = None
     departureTime: Optional[str] = ""
     arrivalTime: Optional[str] = ""
     delivered: Optional[bool] = False
