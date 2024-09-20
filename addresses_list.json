@@ -1,0 +1,17 @@
+{
+  "personal_id": "banana",
+  "summary": {
+    "startAddress": "Piazza Vittorio Emanuele, 24, 55011, Altopascio, LU",
+    "endAddress": "Piazza San Bernardino da Siena, 1, 55041, Camaiore, LU"
+  },
+  "stops": [
+    {
+      "departureAddress": "Piazza Vittorio Emanuele, 24, 55011, Altopascio, LU",
+      "arrivalAddress": "Via Umberto I, 103, 55022, Bagni di Lucca, LU"
+    },
+    {
+      "departureAddress": "Via Umberto I, 1, 55023, Borgo a Mozzano, LU",
+      "arrivalAddress": "Piazza San Bernardino da Siena, 1, 55041, Camaiore, LU"
+    }
+  ]
+}
