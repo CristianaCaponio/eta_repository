@@ -4,28 +4,6 @@ from model.geopy_input_data import GeopyInputData
 """classes for the first input"""
 
 
-class InitialSummary(BaseModel):
-    startAddress: str
-    startLatitude: float
-    startLongitude: float
-    endAddress: str
-    endLatitude: float
-    endLongitude: float
-
-
-class InitialStopSummary(BaseModel):
-    departureAddress: str
-    departureLatitude: float
-    departureLongitude: float
-    arrivalAddress: str
-    arrivalLatitude: float
-    arrivalLongitude: float
-
-
-class InitialTravelData(BaseModel):
-    summary: InitialSummary
-    stops: List[InitialStopSummary]
-
 
 """classes that populate the database"""
 
@@ -37,11 +15,11 @@ class Summary(BaseModel):
     trafficDelayInSeconds: Optional[int] = 0
     trafficLengthInMeters: Optional[int] = 0
     startAddress: GeopyInputData
-    startLatitude: Optional[float] = None
-    startLongitude: Optional[float] = None
+    startLatitude: float = None
+    startLongitude: float = None
     endAddress:  GeopyInputData
-    endLatitude: Optional[float] = None
-    endLongitude: Optional[float] = None
+    endLatitude: float = None
+    endLongitude: float = None
     departureTime: Optional[str] = ""
     arrivalTime: Optional[str] = ""
 
@@ -53,11 +31,11 @@ class StopSummary(BaseModel):
     trafficDelayInSeconds: Optional[int] = 0
     trafficLengthInMeters: Optional[int] = 0
     departureAddress: GeopyInputData
-    departureLatitude: Optional[float] = None
-    departureLongitude: Optional[float] = None
+    departureLatitude:float = None
+    departureLongitude: float = None
     arrivalAddress: GeopyInputData
-    arrivalLatitude: Optional[float] = None
-    arrivalLongitude: Optional[float] = None
+    arrivalLatitude: float = None
+    arrivalLongitude: float = None
     departureTime: Optional[str] = ""
     arrivalTime: Optional[str] = ""
     delivered: Optional[bool] = False

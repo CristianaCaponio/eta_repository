@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel
 
 
@@ -10,3 +11,4 @@ class GeopyInputData(BaseModel):
     district : str
     house_number : str
     zip_code : str
+    

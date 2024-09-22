@@ -1,0 +1,26 @@
+
+{
+    "addresses_list": [
+        {
+            "address": "Piazza Vittorio Emanuele",
+            "city": "Altopascio",
+            "district": "LU",
+            "house_number": "24",
+            "zip_code": "55011"
+        },
+        {
+            "address": "Via Umberto I",
+            "city": "Bagni di Lucca",
+            "district": "LU",
+            "house_number": "103",
+            "zip_code": "55022"
+        },
+        {
+            "address": "Piazza San Bernardino da Siena",
+            "city": "Camaiore",
+            "district": "LU",
+            "house_number": "1",
+            "zip_code": "55041"
+        }
+    ]
+}

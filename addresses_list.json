@@ -8,13 +8,17 @@
       "district": "LU",
       "zip_code": "55011"
     },
+    "startLatitude": 43.81506,
+    "startLongitude": 10.67463, 
     "endAddress": {
       "address": "Piazza San Bernardino da Siena",
       "house_number": "1",
       "city": "Camaiore",
       "district": "LU",
       "zip_code": "55041"
-    }
+    },
+    "endLatitude": 43.93849,
+    "endLongitude": 10.30428     
   },
   "stops": [
     {
@@ -25,13 +29,17 @@
         "district": "LU",
         "zip_code": "55011"
       },
+      "departureLatitude": 43.81506,
+      "departureLongitude": 10.67463,  
       "arrivalAddress": {
         "address": "Via Umberto I",
         "house_number": "103",
         "city": "Bagni di Lucca",
         "district": "LU",
         "zip_code": "55022"
-      }
+      },
+      "arrivalLatitude": 44.01053,
+      "arrivalLongitude": 10.59126    
     },
     {
       "departureAddress": {
@@ -41,13 +49,17 @@
         "district": "LU",
         "zip_code": "55022"
       },
+      "departureLatitude": 44.01053,
+      "departureLongitude": 10.59126, 
       "arrivalAddress": {
         "address": "Piazza San Bernardino da Siena",
         "house_number": "1",
         "city": "Camaiore",
         "district": "LU",
         "zip_code": "55041"
-      }
+      },
+      "arrivalLatitude": 43.93849,
+      "arrivalLongitude": 10.30428
     }
   ]
 }
