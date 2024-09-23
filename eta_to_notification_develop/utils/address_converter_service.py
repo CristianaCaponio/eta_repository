@@ -79,8 +79,8 @@ class AddressConverter:
                 print(f"Error geocoding address {full_address}: {e}")
                 return None
         
-        coordinate_summary = AddressConverter.populate_travel_data(coordinates, address_list)
-        logger.info(coordinate_summary)
+        travel_data_populated = AddressConverter.populate_travel_data(coordinates, address_list)
+        logger.info(travel_data_populated)
         
        
         coordinates_string = AddressConverter.coordinate_to_string(coordinates)
