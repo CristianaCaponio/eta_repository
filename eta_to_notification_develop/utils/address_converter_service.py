@@ -2,7 +2,7 @@ from typing import List
 import os
 from io import StringIO
 from model.db_models import StopSummary, Summary, TravelData
-from geopy.geocoders import Nominatim
+from geopy.geocoders import ArcGIS #Nominatim
 from model.geopy_input_data import GeopyInputData
 from geopy.extra.rate_limiter import RateLimiter
 from loguru import logger
@@ -60,18 +60,20 @@ class AddressConverter:
     @staticmethod
     def address_to_coordinates_converter(address_list: List[GeopyInputData]) -> str:
         request = os.environ.get("USER_AGENT", "my_agent")
-        geolocator = Nominatim(user_agent=request)
+        geolocator = ArcGIS(user_agent=request)
         geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1, max_retries=10)
 
         coordinates = []
         for single_address in address_list:
             full_address = f"{single_address.address}, {single_address.house_number}, {single_address.city}, {single_address.district}, {single_address.zip_code}"
             try:
-                location = geocode(full_address)
+                location = geocode(full_address,exactly_one = True)
+                logger.info(location.latitude)
 
                 if location:
                     print(f"Geocoded address: {full_address} to {location.latitude}, {location.longitude}")
-                    coordinates.append((round(location.latitude, 5), round(location.longitude, 5)))                    
+                    coordinates.append((round(location.latitude, 6), round(location.longitude, 6)))#((location.latitude, location.longitude))
+                                        
                 else:
                     print(f"A non-existent address was added: {full_address}")
                     return None

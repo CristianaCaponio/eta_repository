@@ -22,7 +22,7 @@ class TomTomParams:
             + "&travelMode=car"   
             + "&routeRepresentation=polyline" 
             + "&departAt=now" 
-            + "&computeBestOrder=true" 
+            + "&computeBestOrder=true"                       
         ) 
     logger.info("sono uscito da request_param di TomTomParams")
                
@@ -94,8 +94,8 @@ class TomTomParams:
                 stops.append(stop_summary)
             
             # Populating TravelData
-            tomtom_travel_data = TravelData(
-                personal_id='banana',  # Adjust as needed
+            tomtom_travel_data = TravelData(  
+                personal_id="banana",                                          
                 summary=route_summary,  # Corrected field name
                 stops=stops  # Corrected field name
             )
