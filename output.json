@@ -1,0 +1,88 @@
+{
+    "personal_id": "09_24_2024_15_13_25",
+    "summary": {
+        "travelMode": "car",
+        "lengthInMeters": 109789,
+        "travelTimeInSeconds": 8496,
+        "trafficDelayInSeconds": 0,
+        "trafficLengthInMeters": 0,
+        "startAddress": {
+            "address": "Piazza Vittorio Emanuele II",
+            "city": "Altopascio",
+            "district": "LU",
+            "house_number": "24",
+            "zip_code": "55011"
+        },
+        "startLatitude": 43.81506,
+        "startLongitude": 10.67459,
+        "endAddress": {
+            "address": "Via Umberto I",
+            "city": "Bagni di Lucca",
+            "district": "LU",
+            "house_number": "103",
+            "zip_code": "55022"
+        },
+        "endLatitude": 43.93845,
+        "endLongitude": 10.30435,
+        "departureTime": "2024-09-24T17:13:25+02:00",
+        "arrivalTime": "2024-09-24T19:35:00+02:00"
+    },
+    "stops": [
+        {
+            "gsin": "some_gsin",
+            "lengthInMeters": 48788,
+            "travelTimeInSeconds": 4029,
+            "trafficDelayInSeconds": 0,
+            "trafficLengthInMeters": 0,
+            "departureAddress": {
+                "address": "Piazza Vittorio Emanuele II",
+                "city": "Altopascio",
+                "district": "LU",
+                "house_number": "24",
+                "zip_code": "55011"
+            },
+            "departureLatitude": 43.81506,
+            "departureLongitude": 10.67459,
+            "arrivalAddress": {
+                "address": "Via Umberto I",
+                "city": "Bagni di Lucca",
+                "district": "LU",
+                "house_number": "103",
+                "zip_code": "55022"
+            },
+            "arrivalLatitude": 44.04942,
+            "arrivalLongitude": 10.67946,
+            "departureTime": "2024-09-24T17:13:25+02:00",
+            "arrivalTime": "2024-09-24T18:20:34+02:00",
+            "delivered": false
+        },
+        {
+            "gsin": "some_gsin",
+            "lengthInMeters": 61001,
+            "travelTimeInSeconds": 4466,
+            "trafficDelayInSeconds": 0,
+            "trafficLengthInMeters": 0,
+            "departureAddress": {
+                "address": "Via Umberto I",
+                "city": "Bagni di Lucca",
+                "district": "LU",
+                "house_number": "103",
+                "zip_code": "55022"
+            },
+            "departureLatitude": 44.04942,
+            "departureLongitude": 10.67946,
+            "arrivalAddress": {
+                "address": "Piazza San Bernardino da Siena",
+                "city": "Camaiore",
+                "district": "LU",
+                "house_number": "1",
+                "zip_code": "55041"
+            },
+            "arrivalLatitude": 43.93845,
+            "arrivalLongitude": 10.30435,
+            "departureTime": "2024-09-24T18:20:34+02:00",
+            "arrivalTime": "2024-09-24T19:35:00+02:00",
+            "delivered": false
+        }
+    ]
+}

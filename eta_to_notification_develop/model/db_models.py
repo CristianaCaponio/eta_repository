@@ -1,8 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Optional
-from model.geopy_input_data import GeopyInputData
+from model.delivery import Address
 """classes for the first input"""
-
 
 
 """classes that populate the database"""
@@ -14,10 +13,10 @@ class Summary(BaseModel):
     travelTimeInSeconds: Optional[int] = 0
     trafficDelayInSeconds: Optional[int] = 0
     trafficLengthInMeters: Optional[int] = 0
-    startAddress: GeopyInputData
+    startAddress: Address
     startLatitude: float = None
     startLongitude: float = None
-    endAddress:  GeopyInputData
+    endAddress:  Address
     endLatitude: float = None
     endLongitude: float = None
     departureTime: Optional[str] = ""
@@ -30,10 +29,10 @@ class StopSummary(BaseModel):
     travelTimeInSeconds: Optional[int] = 0
     trafficDelayInSeconds: Optional[int] = 0
     trafficLengthInMeters: Optional[int] = 0
-    departureAddress: GeopyInputData
-    departureLatitude:float = None
+    departureAddress: Address
+    departureLatitude: float = None
     departureLongitude: float = None
-    arrivalAddress: GeopyInputData
+    arrivalAddress: Address
     arrivalLatitude: float = None
     arrivalLongitude: float = None
     departureTime: Optional[str] = ""
