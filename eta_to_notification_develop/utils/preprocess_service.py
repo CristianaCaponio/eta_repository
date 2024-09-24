@@ -34,7 +34,7 @@ class PreProces:
         for i in range(len(delivery_list) - 1):
 
             address_stop = StopSummary(
-                gsin=delivery_list[i].gsin,
+                gsin=delivery_list[i+1].gsin,
                 departureLatitude=coordinates[i][0],
                 departureLongitude=coordinates[i][1],
                 arrivalLatitude=coordinates[i + 1][0],
@@ -91,7 +91,7 @@ class PreProces:
                 print(f"Error geocoding address {full_address}: {e}")
                 return ""
 
-        logger.info(coordinates)
+        # logger.info(coordinates)
         return coordinates
 
         # travel_data_populated = AddressConverter.populate_travel_data(

@@ -1,9 +1,9 @@
 {
-    "personal_id": "09_24_2024_15_13_25",
+    "personal_id": "09_24_2024_21_32_32",
     "summary": {
         "travelMode": "car",
-        "lengthInMeters": 109789,
-        "travelTimeInSeconds": 8496,
+        "lengthInMeters": 108367,
+        "travelTimeInSeconds": 7296,
         "trafficDelayInSeconds": 0,
         "trafficLengthInMeters": 0,
         "startAddress": {
@@ -24,14 +24,14 @@
         },
         "endLatitude": 43.93845,
         "endLongitude": 10.30435,
-        "departureTime": "2024-09-24T17:13:25+02:00",
-        "arrivalTime": "2024-09-24T19:35:00+02:00"
+        "departureTime": "2024-09-24T23:32:31+02:00",
+        "arrivalTime": "2024-09-25T01:34:07+02:00"
     },
     "stops": [
         {
-            "gsin": "some_gsin",
-            "lengthInMeters": 48788,
-            "travelTimeInSeconds": 4029,
+            "gsin": "test-1",
+            "lengthInMeters": 48115,
+            "travelTimeInSeconds": 3233,
             "trafficDelayInSeconds": 0,
             "trafficLengthInMeters": 0,
             "departureAddress": {
@@ -52,14 +52,14 @@
             },
             "arrivalLatitude": 44.04942,
             "arrivalLongitude": 10.67946,
-            "departureTime": "2024-09-24T17:13:25+02:00",
-            "arrivalTime": "2024-09-24T18:20:34+02:00",
+            "departureTime": "2024-09-24T23:32:31+02:00",
+            "arrivalTime": "2024-09-25T00:26:24+02:00",
             "delivered": false
         },
         {
-            "gsin": "some_gsin",
-            "lengthInMeters": 61001,
-            "travelTimeInSeconds": 4466,
+            "gsin": "test-2",
+            "lengthInMeters": 60252,
+            "travelTimeInSeconds": 4063,
             "trafficDelayInSeconds": 0,
             "trafficLengthInMeters": 0,
             "departureAddress": {
@@ -80,8 +80,8 @@
             },
             "arrivalLatitude": 43.93845,
             "arrivalLongitude": 10.30435,
-            "departureTime": "2024-09-24T18:20:34+02:00",
-            "arrivalTime": "2024-09-24T19:35:00+02:00",
+            "departureTime": "2024-09-25T00:26:24+02:00",
+            "arrivalTime": "2024-09-25T01:34:07+02:00",
             "delivered": false
         }
     ]

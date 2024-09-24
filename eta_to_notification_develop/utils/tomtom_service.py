@@ -20,13 +20,13 @@ class TomTom:
 
     @staticmethod
     def create_request_string(coordinate_list: List[str]) -> str:
-        logger.info("sono entrato in request_param di TomTomParams")
+        # logger.info("sono entrato in request_param di TomTomParams")
         """This method takes all coordinates from travel data (considered parameter -> stops: List[stopSummary] )and returns a query parameter string formatted to build the request URL."""
         coordinate_str = ""
         for coordinate in coordinate_list:
             coordinate_str = coordinate_str + ":" + coordinate[0] + ","+coordinate[1]  # nopep8
 
-        logger.info(coordinate_str)
+        # logger.info(coordinate_str)
 
         return (
             coordinate_str[1:]
@@ -36,21 +36,20 @@ class TomTom:
             + "&departAt=now"
             + "&computeBestOrder=true"
         )
-    logger.info("sono uscito da request_param di TomTomParams")
 
     @staticmethod
     def tomtom_request(request_params: str) -> TravelData:
-        logger.info("sono entrato in tomtom_request di TomTomParams")
+        # logger.info("sono entrato in tomtom_request di TomTomParams")
         baseUrl = "https://api.tomtom.com/routing/1/calculateRoute/"
         API_KEY = os.getenv("TOMTOM_API_KEY")
         if not API_KEY:
             raise ValueError("TOMTOM_API_KEY environment variable is not set.")
 
         requestUrl = baseUrl + request_params + "&key=" + API_KEY
-        logger.info("Request URL: " + requestUrl + "\n")
+        # logger.info("Request URL: " + requestUrl + "\n")
 
         response = requests.get(requestUrl)
-        logger.info(response)
+        # logger.info(response)
         response.raise_for_status()
 
         if response.status_code == 200:
