@@ -3,19 +3,18 @@ import os
 from io import StringIO
 from model.db_models import StopSummary, Summary, TravelData
 from geopy.geocoders import ArcGIS  # Nominatim
-from model.delivery import Delivery, Address
+from model.delivery import Delivery
 from geopy.extra.rate_limiter import RateLimiter
 from loguru import logger
-import datetime
 
 
-class PreProces:
+class PreProcess():
 
     @staticmethod
     def populate_travel_data(delivery_list: List[Delivery]) -> Tuple[List[str], TravelData]:
         """Popola TravelData con coordinate e indirizzi."""
 
-        coordinates = PreProces.address_to_coordinates_converter(
+        coordinates = PreProcess.address_to_coordinates_converter(
             delivery_list)
 
         if len(coordinates) < 2:
@@ -49,6 +48,7 @@ class PreProces:
             summary=new_summary,
             stops=new_stops
         )
+        logger.info(travel_data)
 
         return coordinates, travel_data
 
@@ -67,7 +67,7 @@ class PreProces:
 
     @staticmethod
     def address_to_coordinates_converter(delivery_list: List[Delivery]) -> List[str]:
-        logger.info("enter in address to coordinate converter")
+        # logger.info("enter in address to coordinate converter")
         request = os.environ.get("USER_AGENT", "my_agent")
         geolocator = ArcGIS(user_agent=request)
         geocode = RateLimiter(geolocator.geocode,
@@ -80,9 +80,10 @@ class PreProces:
             try:
                 location = geocode(full_address, exactly_one=True)
                 if location:
-                    print(f"Geocoded address: {full_address} to {location.latitude}, {location.longitude}")  # nopep8
+                    # logger.info((f"Geocoded address: {full_address} to {location.latitude}, {location.longitude}"))  # nopep8
                     # ((location.latitude, location.longitude))
                     coordinates.append((f"{location.latitude}", f"{location.longitude}"))  # nopep8
+                    logger.info(coordinates)
 
                 else:
                     print(f"A non-existent address was added: {full_address}")

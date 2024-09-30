@@ -13,12 +13,12 @@
         "python": "latest"
     },
     "mounts": [
-        "source=/home/eddilorenzings-sensorsit/.ssh,target=/root/.ssh,readonly,type=bind",
+        "source=/home/eddilorenzings-sensorsit/Documents/ngs/application/trackone/Trackone/eta_to_notification/.ssh,target=/root/.ssh,readonly,type=bind",
     ],
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [],
     // Use 'postCreateCommand' to run commands after the container is created.
-    "postCreateCommand": "pip install poetry",
+    "postCreateCommand": "pip install poetry  && git config --global --add safe.directory /workspaces/eta_to_notification",
     // Configure tool-specific properties.
     // "customizations": {},
     // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.

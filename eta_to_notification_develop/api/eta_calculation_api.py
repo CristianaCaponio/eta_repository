@@ -2,8 +2,8 @@ from typing import List
 from utils.tomtom_service import TomTom
 from model.delivery import Delivery
 from fastapi import FastAPI, APIRouter, HTTPException, status
-from utils.preprocess_service import PreProces
-from utils.ordinate_address import ordinate_address
+from utils.preprocess_service import PreProcess
+from utils.postprocess_service import PostProcess
 from model.db_models import TravelData
 from loguru import logger
 import json
@@ -14,91 +14,28 @@ eta_api_router = APIRouter(tags=["Eta-To-Notification"])
 
 app = FastAPI()
 
-# Established connection to MongoDB when app starts
-
-
-# @app.on_event("startup")
-# def startup_db():
-#     db_connect()
-
-
-# Included router
-# app.include_router(eta_api_router)
-
 
 @eta_api_router.post("/eta/calculation", status_code=status.HTTP_201_CREATED)
 async def eta_calculation(delivery_list: List[Delivery]) -> TravelData:
 
-    coordinates, raw_travel_data = PreProces.populate_travel_data(
+    coordinates, raw_travel_data = PreProcess.populate_travel_data(
         delivery_list)
 
     ordered_travel_data = TomTom.order_travel_data(
         coordinates)
 
-    complete_travel_data = ordinate_address(
+    # logger.info(ordered_travel_data)
+
+    complete_travel_data = PostProcess.associate_address(
         raw_travel_data, ordered_travel_data)
 
-    return complete_travel_data
+    # logger.info(complete_travel_data)
 
-    # tomtom_call = TomTomParams.request_params(input_data)
-    # logger.info(input_data)
+    with open("./eta_to_notification_develop/zip_code.json") as cap_file:
+        cap_delays = json.load(cap_file)
+        logger.info(cap_delays)
 
-    # travel_data_population = TomTomParams.tomtom_request(tomtom_call)
-    # logger.info(tomtom_call)
+    delay_travel_data = PostProcess.update_eta(
+        complete_travel_data, cap_delays)
 
-    # return travel_data_population
-    #     try:
-    #         # # Taking delays from JSON file
-    #         # with open("./eta_to_notification_develop/zip_code.json") as cap_file:
-    #         #     cap_delays = json.load(cap_file)
-    #         #     logger.info(cap_delays)
-
-    #         # request_params = TomTomParams.request_params(input_data)
-    #         # logger.info(request_params)
-
-    #         # initial_response = TomTomParams.tomtom_request(
-    #         #     request_params, input_data)
-
-    #         # final_response = TomTomParams.calculate_definitive_eta(
-    #         #     initial_response, cap_delays)
-
-    #         # logger.info(final_response)
-
-    #         # transforming the json object into a dictionary
-    #         # final_response_dict = final_response.dict()
-
-    #         if input_data.summary.startLatitude is None:
-
-    #             start_coordinates = AddressConverter.address_to_coordinates_converter(
-    #                 input_data.summary.startAddress)
-    #             input_data.summary.startLatitude = start_coordinates[0]
-    #             input_data.summary.startLongitude = start_coordinates[1]
-
-    #         if input_data.summary.endLatitude is None:
-    #             end_coordinates = AddressConverter.address_to_coordinates_converter(
-    #                 input_data.summary.endAddress)
-    #             input_data.summary.endLatitude = end_coordinates[0]
-    #             input_data.summary.endLongitude = end_coordinates[1]
-
-    #         for stop in input_data.stops:
-    #             if stop.departureLatitude is None:
-    #                 departure_coordinates = AddressConverter.address_to_coordinates_converter(
-    #                     stop.departureAddress)
-    #                 stop.departureLatitude = departure_coordinates[0]
-    #                 stop.departureLongitude = departure_coordinates[1]
-    #             if stop.arrivalLatitude is None:
-    #                 arrival_coordinates = AddressConverter.address_to_coordinates_converter(
-    #                     stop.arrivalAddress)
-    #                 stop.arrivalLatitude = arrival_coordinates[0]
-    #                 stop.arrivalLongitude = arrival_coordinates[1]
-
-    #         logger.info(input_data)
-
-    #     except Exception as ex:
-    #         logger.error(f"An error occurred during ETA calculation: {ex}")
-    #         raise HTTPException(
-    #             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(ex))
-
-    # @app.on_event("shutdown")
-    # def shutdown_db():
-    #     db_disconnect()
+    return delay_travel_data

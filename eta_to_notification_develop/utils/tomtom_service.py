@@ -2,11 +2,10 @@ from typing import Dict, List
 import requests
 from model.delivery import Address
 from model.db_models import StopSummary, Summary, TravelData
-from datetime import datetime, timedelta
+from datetime import datetime
 from loguru import logger
 import os
 import urllib.parse as urlparse
-import datetime
 
 
 class TomTom:
@@ -15,7 +14,8 @@ class TomTom:
     def order_travel_data(coordinates: List[str]) -> TravelData:
         tomtom_url = TomTom.create_request_string(coordinates)
         json_response = TomTom.tomtom_request(tomtom_url)
-        ordered_travel_data = TomTom.parse_tomtom_response(json_response)
+        ordered_travel_data = TomTom.parse_tomtom_response(
+            json_response)
         return ordered_travel_data
 
     @staticmethod
@@ -35,6 +35,7 @@ class TomTom:
             + "&routeRepresentation=polyline"
             + "&departAt=now"
             + "&computeBestOrder=true"
+            + "&traffic=true"
         )
 
     @staticmethod
@@ -46,7 +47,7 @@ class TomTom:
             raise ValueError("TOMTOM_API_KEY environment variable is not set.")
 
         requestUrl = baseUrl + request_params + "&key=" + API_KEY
-        # logger.info("Request URL: " + requestUrl + "\n")
+        logger.info("Request URL: " + requestUrl + "\n")
 
         response = requests.get(requestUrl)
         # logger.info(response)
@@ -117,66 +118,9 @@ class TomTom:
 
             # Populating TravelData
         tomtom_travel_data = TravelData(
-            personal_id=datetime.datetime.now().strftime("%m_%d_%Y_%H_%M_%S"),
+            personal_id=datetime.now().strftime("%m_%d_%Y_%H_%M_%S"),
             summary=route_summary,  # Corrected field name
             stops=stops  # Corrected field name
         )
 
         return tomtom_travel_data
-
-    # """the next part is about addig delay from cap and changing the departure/arrival time. This is commented """
-
-    # @staticmethod
-    # def add_delay_to_time(time_str: str, delay_in_seconds: int) -> str:
-    #     """This method takes an ISO-format time string and a delay in seconds. It converts the time string to a datetime object,
-    #         applies the delay using timedelta, and returns the updated time as an ISO-format string."""
-    #     time_format = "%Y-%m-%dT%H:%M:%S%z"
-    #     time_obj = datetime.strptime(time_str, time_format)
-    #     new_time_obj = time_obj + timedelta(seconds=delay_in_seconds)
-    #     return new_time_obj.strftime(time_format)
-
-    # @staticmethod
-    # def calculate_definitive_eta(response: TomTomResponse, zip_code_delays: Dict[str, int]) -> TomTomResponse:
-    #     """This method takes a TomTomResponse object and a list of cap delays to update the travelTimeInSeconds variable.
-    #         It adjusts travel times and arrival/departure times based on the accumulated delays."""
-
-    #     logger.debug("Starting definitive ETA calculation.")
-
-    #     for route in response.routes:
-    #         logger.info(f"Processing the route: {route.summary.startAddress} a {route.summary.endAddress}")
-    #         total_delay = 0
-    #         previous_zip_code = None
-
-    #         for leg in route.legs:
-    #             # extracting the departure zip_code from the address
-    #             zip_code = leg.summary.departureAddress.split(',')[-1].strip()
-    #             logger.info(f"departure zip_code: {zip_code}")
-
-    #             # checking if the next zip_code is different from the previous one
-    #             if zip_code is not None:
-    #                 # recovering the zip_code delay
-    #                 delay = zip_code_delays.get(zip_code, 0)
-    #                 logger.info(f"delay for zip_code {zip_code}: {delay} seconds")
-
-    #                 # adding delay to time
-    #                 leg.summary.travelTimeInSeconds += delay
-    #                 total_delay += delay
-
-    #                 # updating the time of arrival
-    #                 leg.summary.arrivalTime = TomTomParams.add_delay_to_time(leg.summary.departureTime, leg.summary.travelTimeInSeconds)
-
-    #             #updating the previous zip-code
-    #             previous_zip_code = zip_code
-
-    #             logger.info(f"Update: time of travel: {leg.summary.travelTimeInSeconds} seconds, "
-    #                         f"time of arrival: {leg.summary.arrivalTime}")
-
-    #         # updating the travel time
-    #         route.summary.travelTimeInSeconds += total_delay
-    #         route.summary.arrivalTime = TomTomParams.add_delay_to_time(route.summary.departureTime, route.summary.travelTimeInSeconds)
-
-    #         logger.info(f"Update: Total time travel: {route.summary.travelTimeInSeconds} seconds, "
-    #                     f"Arrival time: {route.summary.arrivalTime}")
-
-    #     logger.info("Definitive ETA calculatioon completed.")
-    #     return response
