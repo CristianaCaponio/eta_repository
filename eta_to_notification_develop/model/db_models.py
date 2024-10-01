@@ -1,13 +1,10 @@
 from pydantic import BaseModel
 from typing import List, Optional
 from model.delivery import Address
-"""classes for the first input"""
-
-
-"""classes that populate the database"""
-
 
 class Summary(BaseModel):
+    """this class provides the summary of the travel"""
+
     travelMode: Optional[str] = ""
     lengthInMeters: Optional[int] = 0
     travelTimeInSeconds: Optional[int] = 0
@@ -24,6 +21,8 @@ class Summary(BaseModel):
 
 
 class StopSummary(BaseModel):
+    """this class provides information about every stop of the travel"""
+
     gsin: Optional[str] = ""
     lengthInMeters: Optional[int] = 0
     travelTimeInSeconds: Optional[int] = 0
@@ -39,8 +38,9 @@ class StopSummary(BaseModel):
     arrivalTime: Optional[str] = ""
     delivered: Optional[bool] = False
 
-
 class TravelData(BaseModel):
+    """this class recalls the Summary class and contains a list of stops. It will be updated by every function"""
+
     personal_id: str
     summary: Summary
     stops: List[StopSummary]

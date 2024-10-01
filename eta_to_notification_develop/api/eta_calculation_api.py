@@ -18,6 +18,9 @@ app = FastAPI()
 @eta_api_router.post("/eta/calculation", status_code=status.HTTP_201_CREATED)
 async def eta_calculation(delivery_list: List[Delivery]) -> TravelData:
 
+    """this is the api used for ETA calculation. It takes in input a list of addresses with a gsin and return a TravelData object with TomTom information and time delays 
+    provided by every zip code"""
+
     coordinates, raw_travel_data = PreProcess.populate_travel_data(
         delivery_list)
 

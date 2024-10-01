@@ -14,5 +14,6 @@ class Address(BaseModel):
 
 
 class Delivery(BaseModel):
+    """This class contains an instance of the Address class and a gsin"""
     gsin: str
     address: Address

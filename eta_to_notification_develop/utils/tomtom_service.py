@@ -9,9 +9,14 @@ import urllib.parse as urlparse
 
 
 class TomTom:
+    """in this class are stored all the functions related to TomTom and the population of TravelData with the ETAs and information provided by tomTom routing api"""
 
     @staticmethod
     def order_travel_data(coordinates: List[str]) -> TravelData:
+        """this function takes in input a list of strings (the coordinates in string format) and returns a TravelData object.
+        I   t recalls all the following functions to create the coordinates string with the format requested by TomTom url, to make the request to TomTom
+            and to parse the response in order to obtain a TravelData object populated with all TomTom informations and eta calculations"""
+
         tomtom_url = TomTom.create_request_string(coordinates)
         json_response = TomTom.tomtom_request(tomtom_url)
         ordered_travel_data = TomTom.parse_tomtom_response(
@@ -19,9 +24,10 @@ class TomTom:
         return ordered_travel_data
 
     @staticmethod
-    def create_request_string(coordinate_list: List[str]) -> str:
-        # logger.info("sono entrato in request_param di TomTomParams")
-        """This method takes all coordinates from travel data (considered parameter -> stops: List[stopSummary] )and returns a query parameter string formatted to build the request URL."""
+    def create_request_string(coordinate_list: List[str]) -> str:        
+        """This function takes all coordinates in string format and returns a string with the structure needed for TomTom url. An Example of this string
+            is 43.12345,16.12345:43.678910:16.678910."""
+
         coordinate_str = ""
         for coordinate in coordinate_list:
             coordinate_str = coordinate_str + ":" + coordinate[0] + ","+coordinate[1]  # nopep8
@@ -40,7 +46,8 @@ class TomTom:
 
     @staticmethod
     def tomtom_request(request_params: str) -> TravelData:
-        # logger.info("sono entrato in tomtom_request di TomTomParams")
+        """this function is used to make the request to TomTom and returns a json with the TomTom format"""
+
         baseUrl = "https://api.tomtom.com/routing/1/calculateRoute/"
         API_KEY = os.getenv("TOMTOM_API_KEY")
         if not API_KEY:
@@ -61,16 +68,16 @@ class TomTom:
 
     @staticmethod
     def parse_tomtom_response(json_response: dict) -> TravelData:
-
-        # Get start and end coordinates from TomTom
+        """This function parses the reponse provided by TomTom and populates with its data the TravelData object"""
+        
         tomtom_start_latitude = json_response["routes"][0]["legs"][0]["points"][0]["latitude"]
         tomtom_start_longitude = json_response["routes"][0]["legs"][0]["points"][0]["longitude"]
         tomtom_end_latitude = json_response['routes'][0]['legs'][-1]['points'][-1]["latitude"]
         tomtom_end_longitude = json_response['routes'][0]['legs'][-1]['points'][-1]["longitude"]
 
-        # Construct the Summary
+       
         route_summary = Summary(
-            # Corrected
+           
             travelMode=json_response["routes"][0]["sections"][0]["travelMode"],
             lengthInMeters=json_response["routes"][0]["summary"]["lengthInMeters"],
             travelTimeInSeconds=json_response["routes"][0]["summary"]["travelTimeInSeconds"],
@@ -87,8 +94,7 @@ class TomTom:
             departureTime=json_response["routes"][0]["summary"]["departureTime"],
             arrivalTime=json_response["routes"][0]["summary"]["arrivalTime"]
         )
-
-        # Construct the Stops
+     
         stops = []
         for leg_data in json_response["routes"][0]["legs"]:
             tomtom_departure_latitude = leg_data["points"][0]["latitude"]
@@ -97,7 +103,7 @@ class TomTom:
             tomtom_arrival_longitude = leg_data['points'][-1]["longitude"]
 
             stop_summary = StopSummary(
-                gsin="some_gsin",  # Placeholder, replace with real data
+                gsin="some_gsin",  
                 lengthInMeters=leg_data["summary"]["lengthInMeters"],
                 travelTimeInSeconds=leg_data["summary"]["travelTimeInSeconds"],
                 trafficDelayInSeconds=leg_data["summary"]["trafficDelayInSeconds"],
@@ -112,15 +118,14 @@ class TomTom:
                 trafficLengthInMeters=leg_data["summary"]["trafficLengthInMeters"],
                 departureTime=leg_data["summary"]["departureTime"],
                 arrivalTime=leg_data["summary"]["arrivalTime"],
-                delivered=False  # Placeholder, adjust as needed
+                delivered=False  
             )
             stops.append(stop_summary)
 
-            # Populating TravelData
         tomtom_travel_data = TravelData(
             personal_id=datetime.now().strftime("%m_%d_%Y_%H_%M_%S"),
-            summary=route_summary,  # Corrected field name
-            stops=stops  # Corrected field name
+            summary=route_summary,  
+            stops=stops  
         )
 
         return tomtom_travel_data

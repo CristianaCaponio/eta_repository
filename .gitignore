@@ -1,3 +1,6 @@
 
 # ssh key for devcontainer
 .ssh
+
+#.devcontainer
+.devcontainer

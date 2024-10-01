@@ -6,12 +6,17 @@ from typing import Dict
 
 
 class PostProcess():
+    """in this class the coordinates and addresses of TravelData are matched with the new order given by TomTom. the ETAs are updated with the delays given by
+        every zip code and, together with every delay, the departure and arrival time are also updated """
 
     @staticmethod
     def associate_address(raw_travel_data: TravelData, ordered_travel_data: TravelData) -> TravelData:
-        """
-        This function associate an address to a set of coordiantes.
-        """
+        
+        """ this function associates the addresses from raw_travel_data to ordered_travel_data based on the geographical proximity of the stops.
+            It calculates the distance between each stop's coordinates (departure and arrival) in both raw and ordered travel data, and matches the closest ones. 
+            Then, it updates the addresses and gsin for the corresponding stops in ordered_travel_data and updates the summary with the first stop's departure address 
+            and the last stop's arrival address."""  
+           
         for stop in raw_travel_data.stops:
             departure_latitude = stop.departureLatitude
             departure_longitude = stop.departureLongitude
@@ -53,6 +58,7 @@ class PostProcess():
     def add_delay_to_time(time_str: str, delay_in_seconds: int) -> str:
         """This method takes an ISO-format time string and a delay in seconds. It converts the time string to a datetime object,
             applies the delay using timedelta, and returns the updated time as an ISO-format string."""
+        
         time_format = "%Y-%m-%dT%H:%M:%S%z"
         time_obj = datetime.strptime(time_str, time_format)
         new_time_obj = time_obj + timedelta(seconds=delay_in_seconds)
@@ -60,6 +66,8 @@ class PostProcess():
 
     @staticmethod
     def update_eta(travel_data: TravelData, zip_code_delay: Dict[str, int]) -> TravelData:
+        """this function updates ETAs with the delay given by every zip code"""
+
         for i in range(len(travel_data.stops)-1):
             zip_code = travel_data.stops[i+1].departureAddress.zip_code
             delay = zip_code_delay[f"{zip_code}"]
