@@ -17,6 +17,7 @@ requests = "^2.32.3"
 python-dotenv = "^1.0.1"
 mongoengine = "^0.29.0"
 apscheduler = "^3.10.4"
+smsapi-client = "^2.9.6"
 
 
 [build-system]
