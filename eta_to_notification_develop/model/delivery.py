@@ -10,13 +10,10 @@ class Address(BaseModel):
     city: str
     district: str
     house_number: str
-    zip_code: str
-
-    #qui si potrebbero aggiungere questi due campi
-    #telephone_number: str "+3933332345678"
-    #message_sent: bool -> valore default: false
-
+    zip_code: str   
+    telephone_number: str #"+3933332345678"
+   
 class Delivery(BaseModel):
-    """This class contains an instance of the Address class and a gsin"""
+    '''This class contains an instance of the Address class and a gsin'''
     gsin: str
     address: Address

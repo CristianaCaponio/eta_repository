@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
-from model.delivery import Address
+from model.delivery import Address, Delivery
 
 class Summary(BaseModel):
     """this class provides the summary of the travel"""
@@ -37,10 +37,12 @@ class StopSummary(BaseModel):
     departureTime: Optional[str] = ""
     arrivalTime: Optional[str] = ""
     delivered: Optional[bool] = False
+    message_sent: Optional[bool] = False
 
 class TravelData(BaseModel):
     """this class recalls the Summary class and contains a list of stops. It will be updated by every function"""
 
     personal_id: str
+    ginc: str
     summary: Summary
     stops: List[StopSummary]

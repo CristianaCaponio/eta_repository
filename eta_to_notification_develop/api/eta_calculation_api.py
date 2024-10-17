@@ -4,7 +4,7 @@ from model.delivery import Delivery
 from fastapi import FastAPI, APIRouter, HTTPException, status
 from utils.preprocess_service import PreProcess
 from utils.postprocess_service import PostProcess
-from model.db_models import TravelData
+from model.travel_data import TravelData
 from loguru import logger
 import json
 from database.settings import db_connect, db_disconnect

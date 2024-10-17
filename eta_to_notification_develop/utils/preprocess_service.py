@@ -1,7 +1,7 @@
 from typing import List, Tuple
 import os
 from io import StringIO
-from model.db_models import StopSummary, Summary, TravelData
+from model.travel_data import StopSummary, Summary, TravelData
 from geopy.geocoders import ArcGIS  # Nominatim
 from model.delivery import Delivery
 from geopy.extra.rate_limiter import RateLimiter
@@ -48,10 +48,11 @@ class PreProcess():
 
         travel_data = TravelData(
             personal_id="temporary_ID",
+            ginc= "some_ginc",      
             summary=new_summary,
             stops=new_stops
         )
-        logger.info(travel_data)
+        logger.info(f"travel data in preprocess_service: {travel_data}")
 
         return coordinates, travel_data
 

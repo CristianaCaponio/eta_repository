@@ -1,5 +1,5 @@
 from geopy import distance
-from model.db_models import TravelData
+from model.travel_data import TravelData
 from loguru import logger
 from datetime import datetime, timedelta
 from typing import Dict

@@ -4,3 +4,7 @@
 
 #.devcontainer
 .devcontainer
+devcontainer.*
+
+#env
+*.env
