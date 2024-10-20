@@ -53,16 +53,30 @@ class PostProcess():
             ordered_travel_data.summary.endAddress = ordered_travel_data.stops[-1].arrivalAddress
 
         return ordered_travel_data
-
+    
     @staticmethod
-    def add_delay_to_time(time_str: str, delay_in_seconds: int) -> str:
+    def add_delay_to_time(time_obj: datetime, delay_in_seconds: int) -> datetime:
+        """This method takes a datetime object and a delay in seconds. It applies the delay using timedelta, and 
+        returns the updated time as an ISO 8601 string."""        
+        
+        new_time_obj = time_obj + timedelta(seconds=delay_in_seconds)        
+        
+        return new_time_obj
+
+    # @staticmethod
+    # def add_delay_to_time(time_str: str, delay_in_seconds: int) -> str:
         """This method takes an ISO-format time string and a delay in seconds. It converts the time string to a datetime object,
             applies the delay using timedelta, and returns the updated time as an ISO-format string."""
         
-        time_format = "%Y-%m-%dT%H:%M:%S%z"
-        time_obj = datetime.strptime(time_str, time_format)
-        new_time_obj = time_obj + timedelta(seconds=delay_in_seconds)
-        return new_time_obj.strftime(time_format)
+        
+        # time_format = "%Y-%m-%dT%H:%M:%S%z"
+        # time_obj = datetime.strptime(time_str, time_format)
+        # new_time_obj = time_obj + timedelta(seconds=delay_in_seconds)
+        # formatted_time_str = new_time_obj.strftime("%Y-%m-%dT%H:%M:%S%z")        
+        # formatted_time_with_colon = formatted_time_str[:-2] + ":" + formatted_time_str[-2:]
+        
+        # return formatted_time_with_colon
+        #return new_time_obj.strptime(time_format)
 
     @staticmethod
     def update_eta(travel_data: TravelData, zip_code_delay: Dict[str, int]) -> TravelData:

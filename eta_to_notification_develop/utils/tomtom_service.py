@@ -1,6 +1,6 @@
 from typing import Dict, List
 import requests
-from model.delivery import Address, Delivery
+from model.delivery import Address
 from model.travel_data import StopSummary, Summary, TravelData
 from datetime import datetime
 from loguru import logger
@@ -75,6 +75,9 @@ class TomTom:
         tomtom_end_latitude = json_response['routes'][0]['legs'][-1]['points'][-1]["latitude"]
         tomtom_end_longitude = json_response['routes'][0]['legs'][-1]['points'][-1]["longitude"]
 
+        start_time_iso = datetime.fromisoformat(json_response["routes"][0]["summary"]["departureTime"])
+        end_time_iso = datetime.fromisoformat(json_response["routes"][0]["summary"]["arrivalTime"])
+
        
         route_summary = Summary(
            
@@ -91,8 +94,8 @@ class TomTom:
                 address="address1", city="city1", district="disctrict1", house_number="number1", zip_code="zip_code1", telephone_number="some_other_number"),
             endLatitude=tomtom_end_latitude,
             endLongitude=tomtom_end_longitude,
-            departureTime=json_response["routes"][0]["summary"]["departureTime"],
-            arrivalTime=json_response["routes"][0]["summary"]["arrivalTime"]
+            departureTime=start_time_iso,#json_response["routes"][0]["summary"]["departureTime"],
+            arrivalTime=end_time_iso #json_response["routes"][0]["summary"]["arrivalTime"]
         )
      
         stops = []
@@ -101,6 +104,10 @@ class TomTom:
             tomtom_departure_longitude = leg_data["points"][0]["longitude"]
             tomtom_arrival_latitude = leg_data['points'][-1]["latitude"]
             tomtom_arrival_longitude = leg_data['points'][-1]["longitude"]
+
+             
+            departure_time_iso = datetime.fromisoformat(leg_data["summary"]["departureTime"])
+            arrival_time_iso = datetime.fromisoformat(leg_data["summary"]["arrivalTime"])
 
             stop_summary = StopSummary(
                 gsin="some_gsin",  
@@ -116,8 +123,8 @@ class TomTom:
                 arrivalLatitude=tomtom_arrival_latitude,
                 arrivalLongitude=tomtom_arrival_longitude,
                 trafficLengthInMeters=leg_data["summary"]["trafficLengthInMeters"],
-                departureTime=leg_data["summary"]["departureTime"],
-                arrivalTime=leg_data["summary"]["arrivalTime"],
+                departureTime=departure_time_iso,#leg_data["summary"]["departureTime"],
+                arrivalTime=arrival_time_iso,#leg_data["summary"]["arrivalTime"],
                 delivered=False  
             )
             stops.append(stop_summary)

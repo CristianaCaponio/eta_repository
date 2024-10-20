@@ -7,7 +7,7 @@
             "district": "PI",
             "house_number": "40",
             "zip_code": "56124",
-            "telephone_number": "+393393333333"
+            "telephone_number": "+39001"
         }
     },
     {
@@ -18,7 +18,7 @@
             "district": "PI",
             "house_number": "8",
             "zip_code": "56121",
-            "telephone_number": "+393384444444"
+            "telephone_number": "+39002"
         }
     },
     {
@@ -29,7 +29,7 @@
             "district": "PI",
             "house_number": "31",
             "zip_code": "56124",
-            "telephone_number": "+393355555555"
+            "telephone_number": "+39003"
         }
     },
     {
@@ -40,7 +40,7 @@
             "district": "PI",
             "house_number": "17",
             "zip_code": "56124",
-            "telephone_number": "+393336666666"
+            "telephone_number": "+39004"
         }
     },
     {
@@ -51,7 +51,7 @@
             "district": "PI",
             "house_number": "52",
             "zip_code": "56124",
-            "telephone_number": "+393347777777"
+            "telephone_number": "+39005"
         }
     },
     {
@@ -62,7 +62,7 @@
             "district": "PI",
             "house_number": "34",
             "zip_code": "56121",
-            "telephone_number": "+393348888888"
+            "telephone_number": "+39006"
         }
     },
     {
@@ -73,7 +73,7 @@
             "district": "PI",
             "house_number": "293",
             "zip_code": "56121",
-            "telephone_number": "3334567812"
+            "telephone_number": "39007"
         }
     },
     {
@@ -84,7 +84,7 @@
             "district": "PI",
             "house_number": "97",
             "zip_code": "56121",
-            "telephone_number": "+393321111111"
+            "telephone_number": "+39008"
         }
     },
     {
@@ -95,7 +95,7 @@
             "district": "PI",
             "house_number": "2",
             "zip_code": "56121",
-            "telephone_number": "+393319999999"
+            "telephone_number": "+39009"
         }
     },
     {
@@ -106,7 +106,7 @@
             "district": "PI",
             "house_number": "18",
             "zip_code": "56017",
-            "telephone_number": "+393311010101"
+            "telephone_number": "+390010"
         }
     },
     {
@@ -117,7 +117,7 @@
             "district": "PI",
             "house_number": "7",
             "zip_code": "56017",
-            "telephone_number": "+393387676767"
+            "telephone_number": "+390011"
         }
     },
     {
@@ -128,7 +128,7 @@
             "district": "PI",
             "house_number": "27",
             "zip_code": "56017",
-            "telephone_number": "+393323535353"
+            "telephone_number": "+390012"
         }
     },
     {
@@ -139,7 +139,7 @@
             "district": "PI",
             "house_number": "31",
             "zip_code": "56010",
-            "telephone_number": "+393770000000"
+            "telephone_number": "+390013"
         }
     },
     {
@@ -150,7 +150,7 @@
             "district": "PI",
             "house_number": "63",
             "zip_code": "56021",
-            "telephone_number": "+390005435433"
+            "telephone_number": "+390014"
         }
     }
 ]

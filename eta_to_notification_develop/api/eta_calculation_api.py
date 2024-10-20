@@ -1,9 +1,11 @@
 from typing import List
+from test.tomtom.tomtom_recalculation import TomTomRecalculation
 from utils.tomtom_service import TomTom
 from model.delivery import Delivery
 from fastapi import FastAPI, APIRouter, HTTPException, status
 from utils.preprocess_service import PreProcess
 from utils.postprocess_service import PostProcess
+from utils.message_trigger_service import MessageSending
 from model.travel_data import TravelData
 from loguru import logger
 import json
@@ -40,5 +42,24 @@ async def eta_calculation(delivery_list: List[Delivery]) -> TravelData:
 
     delay_travel_data = PostProcess.update_eta(
         complete_travel_data, cap_delays)
+    
+    message_sending = MessageSending.check_time_and_send(delay_travel_data)
+
+    return delay_travel_data
+
+@eta_api_router.post("/eta/modification", status_code=status.HTTP_201_CREATED)
+async def eta_modification(travel_data: TravelData) -> TravelData:
+     
+    ordered_travel_data = TomTomRecalculation.order_travel_data(travel_data)
+    logger.info(f"the travel data of the api are {travel_data}")
+
+    with open("./eta_to_notification_develop/zip_code.json") as cap_file:
+        cap_delays = json.load(cap_file)
+        logger.info(cap_delays)
+
+    delay_travel_data = PostProcess.update_eta(
+travel_data, cap_delays)
+    
+    message_sending = MessageSending.check_time_and_send(delay_travel_data)
 
     return delay_travel_data

@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 from typing import List, Optional
 from model.delivery import Address, Delivery
@@ -16,8 +17,8 @@ class Summary(BaseModel):
     endAddress:  Address
     endLatitude: float = None
     endLongitude: float = None
-    departureTime: Optional[str] = ""
-    arrivalTime: Optional[str] = ""
+    departureTime: Optional[datetime] = None
+    arrivalTime: Optional[datetime] = None
 
 
 class StopSummary(BaseModel):
@@ -34,8 +35,8 @@ class StopSummary(BaseModel):
     arrivalAddress: Address
     arrivalLatitude: float = None
     arrivalLongitude: float = None
-    departureTime: Optional[str] = ""
-    arrivalTime: Optional[str] = ""
+    departureTime: Optional[datetime] = None
+    arrivalTime: Optional[datetime] = None
     delivered: Optional[bool] = False
     message_sent: Optional[bool] = False
 

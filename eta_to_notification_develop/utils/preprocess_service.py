@@ -2,7 +2,7 @@ from typing import List, Tuple
 import os
 from io import StringIO
 from model.travel_data import StopSummary, Summary, TravelData
-from geopy.geocoders import ArcGIS  # Nominatim
+from geopy.geocoders import ArcGIS  
 from model.delivery import Delivery
 from geopy.extra.rate_limiter import RateLimiter
 from loguru import logger
@@ -84,3 +84,5 @@ class PreProcess():
 
         # logger.info(coordinates)
         return coordinates
+
+    
