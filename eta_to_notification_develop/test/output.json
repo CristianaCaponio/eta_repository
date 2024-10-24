@@ -1,10 +1,10 @@
 {
-  "personal_id": "10_18_2024_16_24_47",
+  "personal_id": "10_24_2024_15_15_51",
   "ginc": "some_ginc",
   "summary": {
     "travelMode": "car",
-    "lengthInMeters": 43315,
-    "travelTimeInSeconds": 6221,
+    "lengthInMeters": 43443,
+    "travelTimeInSeconds": 6395,
     "trafficDelayInSeconds": 0,
     "trafficLengthInMeters": 0,
     "startAddress": {
@@ -27,14 +27,14 @@
     },
     "endLatitude": 43.68445,
     "endLongitude": 10.48887,
-    "departureTime": "2024-10-18T18:24:47+02:00",
-    "arrivalTime": "2024-10-18T20:28:23+02:00"
+    "departureTime": "2024-10-24T17:15:51+02:00",
+    "arrivalTime": "2024-10-24T19:22:20+02:00"
   },
   "stops": [
     {
       "gsin": "40212345678955996421",
       "lengthInMeters": 1697,
-      "travelTimeInSeconds": 327,
+      "travelTimeInSeconds": 322,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -57,15 +57,15 @@
       },
       "arrivalLatitude": 43.72381,
       "arrivalLongitude": 10.42346,
-      "departureTime": "2024-10-18T18:24:47+02:00",
-      "arrivalTime": "2024-10-18T18:30:13+02:00",
-      "delivered": false,
-      "message_sent": false
+      "departureTime": "2024-10-24T17:15:51+02:00",
+      "arrivalTime": "2024-10-24T17:21:13+02:00",
+      "delivered": true,
+      "message_sent": true
     },
     {
       "gsin": "40212345678955996420",
       "lengthInMeters": 5430,
-      "travelTimeInSeconds": 658,
+      "travelTimeInSeconds": 669,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -88,15 +88,15 @@
       },
       "arrivalLatitude": 43.75709,
       "arrivalLongitude": 10.4269,
-      "departureTime": "2024-10-18T18:31:53+02:00",
-      "arrivalTime": "2024-10-18T18:42:51+02:00",
+      "departureTime": "2024-10-24T17:22:53+02:00",
+      "arrivalTime": "2024-10-24T17:34:01+02:00",
       "delivered": false,
-      "message_sent": false
+      "message_sent": true
     },
     {
       "gsin": "40212345678955996419",
       "lengthInMeters": 993,
-      "travelTimeInSeconds": 182,
+      "travelTimeInSeconds": 180,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -119,15 +119,15 @@
       },
       "arrivalLatitude": 43.75897,
       "arrivalLongitude": 10.43622,
-      "departureTime": "2024-10-18T18:44:31+02:00",
-      "arrivalTime": "2024-10-18T18:47:33+02:00",
-      "delivered": false,
-      "message_sent": false
+      "departureTime": "2024-10-24T17:35:41+02:00",
+      "arrivalTime": "2024-10-24T17:38:41+02:00",
+      "delivered": true,
+      "message_sent": true
     },
     {
       "gsin": "40212345678955996418",
       "lengthInMeters": 3483,
-      "travelTimeInSeconds": 455,
+      "travelTimeInSeconds": 463,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -150,15 +150,15 @@
       },
       "arrivalLatitude": 43.74752,
       "arrivalLongitude": 10.46526,
-      "departureTime": "2024-10-18T18:49:13+02:00",
-      "arrivalTime": "2024-10-18T18:56:47+02:00",
-      "delivered": false,
-      "message_sent": false
+      "departureTime": "2024-10-24T17:40:21+02:00",
+      "arrivalTime": "2024-10-24T17:48:03+02:00",
+      "delivered": true,
+      "message_sent": true
     },
     {
       "gsin": "40212345678955996413",
       "lengthInMeters": 9735,
-      "travelTimeInSeconds": 936,
+      "travelTimeInSeconds": 984,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -181,15 +181,15 @@
       },
       "arrivalLatitude": 43.70579,
       "arrivalLongitude": 10.43988,
-      "departureTime": "2024-10-18T18:58:27+02:00",
-      "arrivalTime": "2024-10-18T19:14:03+02:00",
-      "delivered": false,
-      "message_sent": false
+      "departureTime": "2024-10-24T17:49:43+02:00",
+      "arrivalTime": "2024-10-24T18:06:06+02:00",
+      "delivered": true,
+      "message_sent": true
     },
     {
       "gsin": "40212345678955996412",
       "lengthInMeters": 2189,
-      "travelTimeInSeconds": 292,
+      "travelTimeInSeconds": 318,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -212,15 +212,15 @@
       },
       "arrivalLatitude": 43.7064,
       "arrivalLongitude": 10.43256,
-      "departureTime": "2024-10-18T19:15:43+02:00",
-      "arrivalTime": "2024-10-18T19:20:35+02:00",
+      "departureTime": "2024-10-24T18:07:46+02:00",
+      "arrivalTime": "2024-10-24T18:13:04+02:00",
       "delivered": false,
-      "message_sent": false
+      "message_sent": true
     },
     {
       "gsin": "40212345678955996411",
-      "lengthInMeters": 2119,
-      "travelTimeInSeconds": 337,
+      "lengthInMeters": 2247,
+      "travelTimeInSeconds": 341,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -243,15 +243,15 @@
       },
       "arrivalLatitude": 43.71057,
       "arrivalLongitude": 10.41437,
-      "departureTime": "2024-10-18T19:22:15+02:00",
-      "arrivalTime": "2024-10-18T19:27:52+02:00",
+      "departureTime": "2024-10-24T18:14:44+02:00",
+      "arrivalTime": "2024-10-24T18:20:24+02:00",
       "delivered": false,
       "message_sent": false
     },
     {
       "gsin": "40212345678955996410",
       "lengthInMeters": 5125,
-      "travelTimeInSeconds": 783,
+      "travelTimeInSeconds": 809,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -274,15 +274,15 @@
       },
       "arrivalLatitude": 43.69086,
       "arrivalLongitude": 10.38389,
-      "departureTime": "2024-10-18T19:29:32+02:00",
-      "arrivalTime": "2024-10-18T19:42:34+02:00",
+      "departureTime": "2024-10-24T18:22:04+02:00",
+      "arrivalTime": "2024-10-24T18:35:32+02:00",
       "delivered": false,
       "message_sent": false
     },
     {
       "gsin": "40212345678955996415",
       "lengthInMeters": 5146,
-      "travelTimeInSeconds": 788,
+      "travelTimeInSeconds": 799,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -305,15 +305,15 @@
       },
       "arrivalLatitude": 43.69409,
       "arrivalLongitude": 10.42039,
-      "departureTime": "2024-10-18T19:44:14+02:00",
-      "arrivalTime": "2024-10-18T19:57:22+02:00",
+      "departureTime": "2024-10-24T18:37:12+02:00",
+      "arrivalTime": "2024-10-24T18:50:30+02:00",
       "delivered": false,
       "message_sent": false
     },
     {
       "gsin": "40212345678955996416",
       "lengthInMeters": 1268,
-      "travelTimeInSeconds": 382,
+      "travelTimeInSeconds": 389,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -336,15 +336,15 @@
       },
       "arrivalLatitude": 43.69762,
       "arrivalLongitude": 10.43009,
-      "departureTime": "2024-10-18T19:59:02+02:00",
-      "arrivalTime": "2024-10-18T20:05:24+02:00",
+      "departureTime": "2024-10-24T18:52:10+02:00",
+      "arrivalTime": "2024-10-24T18:58:39+02:00",
       "delivered": false,
       "message_sent": false
     },
     {
       "gsin": "40212345678955996417",
       "lengthInMeters": 1546,
-      "travelTimeInSeconds": 326,
+      "travelTimeInSeconds": 338,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -367,15 +367,15 @@
       },
       "arrivalLatitude": 43.6932,
       "arrivalLongitude": 10.44448,
-      "departureTime": "2024-10-18T20:07:04+02:00",
-      "arrivalTime": "2024-10-18T20:12:30+02:00",
+      "departureTime": "2024-10-24T19:00:19+02:00",
+      "arrivalTime": "2024-10-24T19:05:57+02:00",
       "delivered": false,
       "message_sent": false
     },
     {
       "gsin": "40212345678955996414",
       "lengthInMeters": 429,
-      "travelTimeInSeconds": 154,
+      "travelTimeInSeconds": 158,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -398,15 +398,15 @@
       },
       "arrivalLatitude": 43.69453,
       "arrivalLongitude": 10.44767,
-      "departureTime": "2024-10-18T20:14:10+02:00",
-      "arrivalTime": "2024-10-18T20:16:43+02:00",
+      "departureTime": "2024-10-24T19:07:37+02:00",
+      "arrivalTime": "2024-10-24T19:10:15+02:00",
       "delivered": false,
       "message_sent": false
     },
     {
       "gsin": "40212345678955996422",
       "lengthInMeters": 4155,
-      "travelTimeInSeconds": 601,
+      "travelTimeInSeconds": 625,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -429,8 +429,8 @@
       },
       "arrivalLatitude": 43.68445,
       "arrivalLongitude": 10.48887,
-      "departureTime": "2024-10-18T20:18:23+02:00",
-      "arrivalTime": "2024-10-18T20:28:23+02:00",
+      "departureTime": "2024-10-24T19:11:55+02:00",
+      "arrivalTime": "2024-10-24T19:22:20+02:00",
       "delivered": false,
       "message_sent": false
     }
