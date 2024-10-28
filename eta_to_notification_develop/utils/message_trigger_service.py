@@ -1,7 +1,9 @@
-from model.travel_data import TravelData
+from model.travel_data import StopSummary, TravelData
 from datetime import datetime, timedelta
+from smsapi.client import SmsApiComClient
 from loguru import logger
 import pytz
+import os
 
 """This application takes a TravelData object as input and iterates through its stop-arrivals to retrieve phone numbers and arrival times. If the arrival times 
 are less than one hour from the current time, a message is printed, and the message_sent attribute changes from false to true."""
@@ -19,8 +21,22 @@ class MessageSending:
             if stop.message_sent == False:
                 arrival_time = stop.arrivalTime
                 
-                if arrival_time < current_time + timedelta(hours=1):                    
-                    logger.info(f"Telefono: {stop.arrivalAddress.telephone_number}. Il tuo pacco è in consegna. Orario previsto: {stop.arrivalTime}")
+                if arrival_time < current_time + timedelta(minutes=2):#(hours=1):
+                    message_sent = MessageSending.send_message(stop)                    
+                    #logger.info(f"Telefono: {stop.arrivalAddress.telephone_number}. Il tuo pacco è in consegna. Orario previsto: {stop.arrivalTime}")#qui va il messaggio
                     stop.message_sent = True
 
 
+
+    @staticmethod
+    def send_message(stop: StopSummary):
+        sms_token = os.getenv("SMS_DELIVERING")
+        logger.info(f"il token dell'api degli sms è {sms_token}")        
+        client = SmsApiComClient(access_token=sms_token)
+        
+        logger.info(f"il numero di telefono è {stop.arrivalAddress.telephone_number} e l'orario è {stop.arrivalTime}")
+
+        #send_results = client.sms.send(to = stop.arrivalAddress.telephone_number, message = f"il tuo pacco arriverà alle ore {stop.arrivalTime}",from_ = "Test")
+
+        # for result in send_results:
+        #     logger.info(result.id, result.points, result.error)

@@ -1,15 +1,14 @@
 from typing import List
-from test.tomtom.tomtom_recalculation import TomTomRecalculation
+from utils.tomtom_recalculation import TomTomRecalculation
 from utils.tomtom_service import TomTom
 from model.delivery import Delivery
-from fastapi import FastAPI, APIRouter, HTTPException, status
+from fastapi import FastAPI, APIRouter, status
 from utils.preprocess_service import PreProcess
 from utils.postprocess_service import PostProcess
 from utils.message_trigger_service import MessageSending
 from model.travel_data import TravelData
 from loguru import logger
 import json
-from database.settings import db_connect, db_disconnect
 
 
 eta_api_router = APIRouter(tags=["Eta-To-Notification"])
@@ -49,16 +48,18 @@ async def eta_calculation(delivery_list: List[Delivery]) -> TravelData:
 
 @eta_api_router.post("/eta/modification", status_code=status.HTTP_201_CREATED)
 async def eta_modification(travel_data: TravelData) -> TravelData:
+
+    """this is the api used to trigger again the TomTom service when a delivery is made. It takes in input a TravelData object 
+    and returns an updated Trabel Data Object"""
      
-    ordered_travel_data = TomTomRecalculation.order_travel_data(travel_data)
-    logger.info(f"the travel data of the api are {travel_data}")
+    ordered_travel_data = TomTomRecalculation.order_travel_data(travel_data)    
+    #logger.info(f"the travel data of the api are {travel_data}")
 
     with open("./eta_to_notification_develop/zip_code.json") as cap_file:
         cap_delays = json.load(cap_file)
         logger.info(cap_delays)
 
-    delay_travel_data = PostProcess.update_eta(
-travel_data, cap_delays)
+    delay_travel_data = PostProcess.update_eta(travel_data, cap_delays)
     
     message_sending = MessageSending.check_time_and_send(delay_travel_data)
 

@@ -1,11 +1,8 @@
-from typing import Dict, List
 import requests
-from model.delivery import Address
-from model.travel_data import StopSummary, Summary, TravelData
+from model.travel_data import TravelData
 from datetime import datetime
 from loguru import logger
 import os
-import urllib.parse as urlparse
 
 """questo è un test. Sto lasciando i nomi dei metodi uguali a quelli della classe TomTom per fare il confronto e capire come e se ottimizzare"""
 
@@ -37,16 +34,16 @@ class TomTomRecalculation:
         arrival_coordinates = []
 
         for single_stop in travel_data.stops:
-            logger.info(f"i delivered fuori dall'if è {single_stop.delivered}")
+            #logger.info(f"i delivered fuori dall'if è {single_stop.delivered}")
 
-            logger.info(f"il singolo stop è {single_stop}")
+            #logger.info(f"il singolo stop è {single_stop}")
             if  not single_stop.delivered: #== False:               
                 
                 if departure_coordinates is None:
                     departure_coordinates = [single_stop.departureLatitude, single_stop.departureLongitude] 
                     logger.info(f"il departure_coordinate è {departure_coordinates}")
                                  
-                logger.info(f"i delivered dentro l'if è {single_stop.delivered}") 
+                #logger.info(f"i delivered dentro l'if è {single_stop.delivered}") 
                 arrival_coordinates.append([single_stop.arrivalLatitude, single_stop.arrivalLongitude])
             
                 
@@ -87,14 +84,13 @@ class TomTomRecalculation:
 
     @staticmethod
     def parse_tomtom_response(json_response: dict, travel_data: TravelData) -> TravelData:
-        """This function parses the response provided by TomTom and modifies the existing TravelData object with its data."""       
-
-        
+        """This function parses the response provided by TomTom and modifies the existing TravelData object with its data."""
+              
         tomtom_length_in_meters = json_response["routes"][0]["summary"]["lengthInMeters"]
         tomtom_travel_time_in_seconds = json_response["routes"][0]["summary"]["travelTimeInSeconds"]
         tomtom_traffic_delay_in_seconds = json_response["routes"][0]["summary"]["trafficDelayInSeconds"]
         tomtom_traffic_length_in_meters = json_response["routes"][0]["summary"]["trafficLengthInMeters"]
-        start_time_iso = datetime.fromisoformat(json_response["routes"][0]["summary"]["departureTime"])
+        start_time_iso = datetime.fromisoformat(json_response["routes"][0]["summary"]["departureTime"])       
         end_time_iso = datetime.fromisoformat(json_response["routes"][0]["summary"]["arrivalTime"])                 
 
         travel_data.summary.lengthInMeters = tomtom_length_in_meters
@@ -102,7 +98,9 @@ class TomTomRecalculation:
         travel_data.summary.trafficDelayInSeconds = tomtom_traffic_delay_in_seconds
         travel_data.summary.trafficLengthInMeters = tomtom_traffic_length_in_meters
         travel_data.summary.departureTime = start_time_iso
+        #logger.info(f"il departure time del summary è { travel_data.summary.departureTime }")
         travel_data.summary.arrivalTime = end_time_iso
+        #logger.info(f"l'arrival time del summary è { travel_data.summary.arrivalTime }")
 
         for leg_index, leg_data in enumerate(json_response["routes"][0]["legs"]):
             stop = travel_data.stops[leg_index]
@@ -114,11 +112,13 @@ class TomTomRecalculation:
                 stop.trafficDelayInSeconds = leg_data["summary"]["trafficDelayInSeconds"]
                 stop.trafficLengthInMeters = leg_data["summary"]["trafficLengthInMeters"]
                 stop.departureTime = datetime.fromisoformat(leg_data["summary"]["departureTime"])
+                #logger.info(f"il departure time dello stop è {stop.departureTime}")
                 stop.arrivalTime = datetime.fromisoformat(leg_data["summary"]["arrivalTime"])
+                #logger.info(f"l'arrival time dello stop è {stop.arrivalTime}")
 
-            travel_data.stops = [stop for stop in travel_data.stops if not stop.delivered]
-            travel_data.summary.startAddress = travel_data.stops[0].departureAddress
-            travel_data.summary.endAddress = travel_data.stops[-1].arrivalAddress
+        travel_data.stops = [stop for stop in travel_data.stops if not stop.delivered]            
+        travel_data.summary.startAddress = travel_data.stops[0].departureAddress
+        travel_data.summary.endAddress = travel_data.stops[-1].arrivalAddress
 
-            logger.info(f"i travel_data usciti dal parse_tomtom_response sono: {travel_data}")
-            return travel_data
+        #logger.info(f"i travel_data usciti dal parse_tomtom_response sono: {travel_data}")
+        return travel_data

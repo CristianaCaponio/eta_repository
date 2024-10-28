@@ -5,7 +5,6 @@ from model.travel_data import StopSummary, Summary, TravelData
 from datetime import datetime
 from loguru import logger
 import os
-import urllib.parse as urlparse
 
 
 class TomTom:
@@ -81,21 +80,21 @@ class TomTom:
        
         route_summary = Summary(
            
-            travelMode=json_response["routes"][0]["sections"][0]["travelMode"],
-            lengthInMeters=json_response["routes"][0]["summary"]["lengthInMeters"],
-            travelTimeInSeconds=json_response["routes"][0]["summary"]["travelTimeInSeconds"],
-            trafficDelayInSeconds=json_response["routes"][0]["summary"]["trafficDelayInSeconds"],
-            trafficLengthInMeters=json_response["routes"][0]["summary"]["trafficLengthInMeters"],
-            startAddress=Address(
-                address="address1", city="city1", district="disctrict1", house_number="number1", zip_code="zip_code1", telephone_number="some_number"),
-            startLatitude=tomtom_start_latitude,
-            startLongitude=tomtom_start_longitude,
-            endAddress=Address(
-                address="address1", city="city1", district="disctrict1", house_number="number1", zip_code="zip_code1", telephone_number="some_other_number"),
-            endLatitude=tomtom_end_latitude,
-            endLongitude=tomtom_end_longitude,
-            departureTime=start_time_iso,#json_response["routes"][0]["summary"]["departureTime"],
-            arrivalTime=end_time_iso #json_response["routes"][0]["summary"]["arrivalTime"]
+            travelMode = json_response["routes"][0]["sections"][0]["travelMode"],
+            lengthInMeters = json_response["routes"][0]["summary"]["lengthInMeters"],
+            travelTimeInSeconds = json_response["routes"][0]["summary"]["travelTimeInSeconds"],
+            trafficDelayInSeconds = json_response["routes"][0]["summary"]["trafficDelayInSeconds"],
+            trafficLengthInMeters = json_response["routes"][0]["summary"]["trafficLengthInMeters"],
+            startAddress = Address(
+                address = "address1", city = "city1", district = "disctrict1", house_number = "number1", zip_code = "zip_code1", telephone_number = "some_number"),
+            startLatitude = tomtom_start_latitude,
+            startLongitude = tomtom_start_longitude,
+            endAddress = Address(
+                address = "address1", city = "city1", district = "disctrict1", house_number = "number1", zip_code = "zip_code1", telephone_number = "some_other_number"),
+            endLatitude = tomtom_end_latitude,
+            endLongitude = tomtom_end_longitude,
+            departureTime = start_time_iso,
+            arrivalTime = end_time_iso 
         )
      
         stops = []
@@ -110,30 +109,30 @@ class TomTom:
             arrival_time_iso = datetime.fromisoformat(leg_data["summary"]["arrivalTime"])
 
             stop_summary = StopSummary(
-                gsin="some_gsin",  
-                lengthInMeters=leg_data["summary"]["lengthInMeters"],
-                travelTimeInSeconds=leg_data["summary"]["travelTimeInSeconds"],
-                trafficDelayInSeconds=leg_data["summary"]["trafficDelayInSeconds"],
-                departureAddress=Address(
-                    address="address1", city="city1", district="disctrict1", house_number="number1", zip_code="zip_code1", telephone_number="one_number"), 
-                departureLatitude=tomtom_departure_latitude,
-                departureLongitude=tomtom_departure_longitude,
-                arrivalAddress=Address(
-                    address="address1", city="city1", district="disctrict1", house_number="number1", zip_code="zip_code1", telephone_number="one_other_number"),
-                arrivalLatitude=tomtom_arrival_latitude,
-                arrivalLongitude=tomtom_arrival_longitude,
-                trafficLengthInMeters=leg_data["summary"]["trafficLengthInMeters"],
-                departureTime=departure_time_iso,#leg_data["summary"]["departureTime"],
-                arrivalTime=arrival_time_iso,#leg_data["summary"]["arrivalTime"],
-                delivered=False  
+                gsin = "some_gsin",  
+                lengthInMeters = leg_data["summary"]["lengthInMeters"],
+                travelTimeInSeconds = leg_data["summary"]["travelTimeInSeconds"],
+                trafficDelayInSeconds = leg_data["summary"]["trafficDelayInSeconds"],
+                departureAddress = Address(
+                    address = "address1", city = "city1", district = "disctrict1", house_number = "number1", zip_code = "zip_code1", telephone_number = "one_number"), 
+                departureLatitude = tomtom_departure_latitude,
+                departureLongitude = tomtom_departure_longitude,
+                arrivalAddress = Address(
+                    address = "address1", city = "city1", district = "disctrict1", house_number = "number1", zip_code = "zip_code1", telephone_number = "one_other_number"),
+                arrivalLatitude = tomtom_arrival_latitude,
+                arrivalLongitude = tomtom_arrival_longitude,
+                trafficLengthInMeters = leg_data["summary"]["trafficLengthInMeters"],
+                departureTime = departure_time_iso,#leg_data["summary"]["departureTime"],
+                arrivalTime = arrival_time_iso,#leg_data["summary"]["arrivalTime"],
+                delivered = False  
             )
             stops.append(stop_summary)
        
         tomtom_travel_data = TravelData(
-            personal_id=datetime.now().strftime("%m_%d_%Y_%H_%M_%S"),    
-            summary=route_summary,  
-            ginc="some_ginc",
-            stops=stops,                               
+            personal_id = datetime.now().strftime("%m_%d_%Y_%H_%M_%S"),    
+            summary = route_summary,  
+            ginc = "some_ginc",
+            stops = stops,                               
 
         )
         logger.info(tomtom_travel_data)
