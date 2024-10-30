@@ -21,8 +21,8 @@ class MessageSending:
             if stop.message_sent == False:
                 arrival_time = stop.arrivalTime
                 
-                if arrival_time < current_time + timedelta(minutes=2):#(hours=1):
-                    message_sent = MessageSending.send_message(stop)                    
+                if arrival_time < current_time + timedelta(hours=1):
+                    MessageSending.send_message(stop)                    
                     #logger.info(f"Telefono: {stop.arrivalAddress.telephone_number}. Il tuo pacco è in consegna. Orario previsto: {stop.arrivalTime}")#qui va il messaggio
                     stop.message_sent = True
 
@@ -33,8 +33,10 @@ class MessageSending:
         sms_token = os.getenv("SMS_DELIVERING")
         logger.info(f"il token dell'api degli sms è {sms_token}")        
         client = SmsApiComClient(access_token=sms_token)
+
+        formatted_datetime = stop.arrivalTime.strftime("%d/%m/%Y %H:%M:%S")
         
-        logger.info(f"il numero di telefono è {stop.arrivalAddress.telephone_number} e l'orario è {stop.arrivalTime}")
+        logger.info(f"il numero di telefono è {stop.arrivalAddress.telephone_number} e l'orario è {formatted_datetime}")
 
         #send_results = client.sms.send(to = stop.arrivalAddress.telephone_number, message = f"il tuo pacco arriverà alle ore {stop.arrivalTime}",from_ = "Test")
 

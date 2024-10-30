@@ -98,27 +98,33 @@ class TomTomRecalculation:
         travel_data.summary.trafficDelayInSeconds = tomtom_traffic_delay_in_seconds
         travel_data.summary.trafficLengthInMeters = tomtom_traffic_length_in_meters
         travel_data.summary.departureTime = start_time_iso
-        #logger.info(f"il departure time del summary è { travel_data.summary.departureTime }")
+        logger.info(f"il departure time del summary è { travel_data.summary.departureTime }")
         travel_data.summary.arrivalTime = end_time_iso
-        #logger.info(f"l'arrival time del summary è { travel_data.summary.arrivalTime }")
+        logger.info(f"l'arrival time del summary è { travel_data.summary.arrivalTime }")
 
         for leg_index, leg_data in enumerate(json_response["routes"][0]["legs"]):
-            stop = travel_data.stops[leg_index]
-                
-            if not stop.delivered:               
+            stop = travel_data.stops[leg_index]               
+                     
 
-                stop.lengthInMeters = leg_data["summary"]["lengthInMeters"]
-                stop.travelTimeInSeconds = leg_data["summary"]["travelTimeInSeconds"]
-                stop.trafficDelayInSeconds = leg_data["summary"]["trafficDelayInSeconds"]
-                stop.trafficLengthInMeters = leg_data["summary"]["trafficLengthInMeters"]
-                stop.departureTime = datetime.fromisoformat(leg_data["summary"]["departureTime"])
-                #logger.info(f"il departure time dello stop è {stop.departureTime}")
-                stop.arrivalTime = datetime.fromisoformat(leg_data["summary"]["arrivalTime"])
-                #logger.info(f"l'arrival time dello stop è {stop.arrivalTime}")
+            stop.lengthInMeters = leg_data["summary"]["lengthInMeters"]
+            stop.travelTimeInSeconds = leg_data["summary"]["travelTimeInSeconds"]
+            stop.trafficDelayInSeconds = leg_data["summary"]["trafficDelayInSeconds"]
+            stop.trafficLengthInMeters = leg_data["summary"]["trafficLengthInMeters"]
+            stop.departureTime = datetime.fromisoformat(leg_data["summary"]["departureTime"])
+            logger.info(f"il departure time dello stop è {stop.departureTime}")
+            stop.arrivalTime = datetime.fromisoformat(leg_data["summary"]["arrivalTime"])
+            logger.info(f"l'arrival time dello stop è {stop.arrivalTime}")
 
-        travel_data.stops = [stop for stop in travel_data.stops if not stop.delivered]            
-        travel_data.summary.startAddress = travel_data.stops[0].departureAddress
-        travel_data.summary.endAddress = travel_data.stops[-1].arrivalAddress
+        undelivered_stops = [stop for stop in travel_data.stops if not stop.delivered]       
+        travel_data.stops = undelivered_stops   
 
+        if undelivered_stops:  
+            travel_data.summary.startAddress = travel_data.stops[0].departureAddress
+            travel_data.summary.endAddress = travel_data.stops[-1].arrivalAddress 
+
+        else:
+            travel_data.summary.startAddress = None
+            travel_data.summary.endAddress = None
+    
         #logger.info(f"i travel_data usciti dal parse_tomtom_response sono: {travel_data}")
         return travel_data

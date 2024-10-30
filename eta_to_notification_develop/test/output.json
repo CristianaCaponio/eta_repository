@@ -91,7 +91,7 @@
       "departureTime": "2024-10-24T17:22:53+02:00",
       "arrivalTime": "2024-10-24T17:34:01+02:00",
       "delivered": false,
-      "message_sent": true
+      "message_sent": false
     },
     {
       "gsin": "40212345678955996419",
@@ -121,8 +121,8 @@
       "arrivalLongitude": 10.43622,
       "departureTime": "2024-10-24T17:35:41+02:00",
       "arrivalTime": "2024-10-24T17:38:41+02:00",
-      "delivered": true,
-      "message_sent": true
+      "delivered": false,
+      "message_sent": false
     },
     {
       "gsin": "40212345678955996418",
@@ -152,8 +152,8 @@
       "arrivalLongitude": 10.46526,
       "departureTime": "2024-10-24T17:40:21+02:00",
       "arrivalTime": "2024-10-24T17:48:03+02:00",
-      "delivered": true,
-      "message_sent": true
+      "delivered": false,
+      "message_sent": false
     },
     {
       "gsin": "40212345678955996413",
@@ -183,8 +183,8 @@
       "arrivalLongitude": 10.43988,
       "departureTime": "2024-10-24T17:49:43+02:00",
       "arrivalTime": "2024-10-24T18:06:06+02:00",
-      "delivered": true,
-      "message_sent": true
+      "delivered": false,
+      "message_sent": false
     },
     {
       "gsin": "40212345678955996412",
