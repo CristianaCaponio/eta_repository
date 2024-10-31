@@ -132,7 +132,8 @@ class TomTom:
             personal_id = datetime.now().strftime("%m_%d_%Y_%H_%M_%S"),    
             summary = route_summary,  
             ginc = "some_ginc",
-            stops = stops,                               
+            stops = stops, 
+            delivered_stops = []                               
 
         )
         logger.info(tomtom_travel_data)

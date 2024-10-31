@@ -49,7 +49,8 @@ class PreProcess():
             personal_id = "temporary_ID",
             ginc = "some_ginc",      
             summary = new_summary,
-            stops = new_stops
+            stops = new_stops,
+            delivered_stops = []
         )
         logger.info(f"travel data in preprocess_service: {travel_data}")
 

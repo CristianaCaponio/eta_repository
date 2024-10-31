@@ -47,3 +47,4 @@ class TravelData(BaseModel):
     ginc: str
     summary: Summary
     stops: List[StopSummary]
+    delivered_stops: List[StopSummary]
