@@ -39,6 +39,7 @@ class StopSummary(BaseModel):
     arrivalTime: Optional[datetime] = None
     delivered: Optional[bool] = False
     message_sent: Optional[bool] = False
+    message_report: Optional[str] = ""
 
 class TravelData(BaseModel):
     """this class recalls the Summary class and contains a list of stops. It will be updated by every function"""

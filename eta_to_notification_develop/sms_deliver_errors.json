@@ -1,0 +1,10 @@
+{
+    "NOT FOUND - wrong id or report has expired": 401,
+    "Message expired": 402, 
+    "Undelivered message (Possible reasons: invalid number, roaming error etc)": 405,
+    "Sending message failed - please report it to the sms service provider": 406,
+    "Message rejected (Possible reasons: invalid number, roaming error etc)": 407,
+    "UNKNOWN - cannot define if the message was delivered or not": 408,
+    "QUEUE - message is waiting to be sent": 409,
+    "STOP - bulk has been stopped by the user": 412
+}

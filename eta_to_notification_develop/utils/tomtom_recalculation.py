@@ -34,14 +34,16 @@ class TomTomRecalculation:
         departure_coordinates = None
         arrival_coordinates = []
 
-        for single_stop in travel_data.stops:                        
-                
-            if departure_coordinates is None:
-                departure_coordinates = [single_stop.departureLatitude, single_stop.departureLongitude] 
-                logger.info(f"il departure_coordinate è {departure_coordinates}")
-                                 
-                #logger.info(f"i delivered dentro l'if è {single_stop.delivered}") 
-            arrival_coordinates.append([single_stop.arrivalLatitude, single_stop.arrivalLongitude])
+        for single_stop in travel_data.stops:
+
+            if single_stop.delivered is False:                        
+                    
+                if departure_coordinates is None:
+                    departure_coordinates = [single_stop.departureLatitude, single_stop.departureLongitude] 
+                    logger.info(f"il departure_coordinate è {departure_coordinates}")
+                                    
+                    #logger.info(f"i delivered dentro l'if è {single_stop.delivered}") 
+                arrival_coordinates.append([single_stop.arrivalLatitude, single_stop.arrivalLongitude])
                             
         coordinate_list = [departure_coordinates] + arrival_coordinates
         coordinate_str = ":".join([f"{coord[0]},{coord[1]}" for coord in coordinate_list])
