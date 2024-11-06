@@ -17,13 +17,20 @@ class TomTomRecalculation:
         I   t recalls all the following functions to create the coordinates string with the format requested by TomTom url, to make the request to TomTom
             and to parse the response in order to obtain a TravelData object populated with all TomTom informations and eta calculations"""
 
-        new_travel_data = TomTomRecalculation.update_travel_data_delivers(travel_data)
-        tomtom_url = TomTomRecalculation.create_request_string(new_travel_data)
-        json_response = TomTomRecalculation.tomtom_request(tomtom_url)
-        ordered_travel_data = TomTomRecalculation.parse_tomtom_response(
-            json_response, new_travel_data)
-        return ordered_travel_data
+         
+        if  travel_data.stops:                     
 
+            new_travel_data = TomTomRecalculation.update_travel_data_delivers(travel_data)
+            tomtom_url = TomTomRecalculation.create_request_string(new_travel_data)
+            json_response = TomTomRecalculation.tomtom_request(tomtom_url)
+            ordered_travel_data = TomTomRecalculation.parse_tomtom_response(
+                json_response, new_travel_data)
+            return ordered_travel_data     
+                
+        else:
+            logger.info("All deliveries were done")
+            return travel_data  
+        
     @staticmethod
     def create_request_string(travel_data: TravelData) -> str:        
         """

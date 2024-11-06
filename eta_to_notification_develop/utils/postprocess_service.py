@@ -82,6 +82,10 @@ class PostProcess():
     def update_eta(travel_data: TravelData, zip_code_delay: Dict[str, int]) -> TravelData:
         """this function updates ETAs with the delay given by every zip code"""
 
+        if not travel_data.stops:
+            logger.info("No stops available in travel_data. Skipping ETA update.")
+            return travel_data
+
         for i in range(len(travel_data.stops)-1):
             zip_code = travel_data.stops[i+1].departureAddress.zip_code
             delay = zip_code_delay[f"{zip_code}"]

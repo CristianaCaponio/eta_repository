@@ -1,12 +1,12 @@
 {
-  "personal_id": "10_31_2024_16_17_16",
+  "personal_id": "11_06_2024_09_01_02",
   "ginc": "some_ginc",
   "summary": {
     "travelMode": "car",
-    "lengthInMeters": 43443,
-    "travelTimeInSeconds": 6549,
-    "trafficDelayInSeconds": 65,
-    "trafficLengthInMeters": 964,
+    "lengthInMeters": 42593,
+    "travelTimeInSeconds": 5986,
+    "trafficDelayInSeconds": 0,
+    "trafficLengthInMeters": 0,
     "startAddress": {
       "address": "Via Cisanello",
       "city": "Pisa",
@@ -27,14 +27,14 @@
     },
     "endLatitude": 43.68445,
     "endLongitude": 10.48887,
-    "departureTime": "2024-10-31T17:17:16+01:00",
-    "arrivalTime": "2024-10-31T19:26:17+01:00"
+    "departureTime": "2024-11-06T10:01:02+01:00",
+    "arrivalTime": "2024-11-06T12:00:41+01:00"
   },
   "stops": [
     {
       "gsin": "40212345678955996421",
       "lengthInMeters": 1697,
-      "travelTimeInSeconds": 331,
+      "travelTimeInSeconds": 300,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -57,15 +57,16 @@
       },
       "arrivalLatitude": 43.72381,
       "arrivalLongitude": 10.42346,
-      "departureTime": "2024-10-31T17:17:16+01:00",
-      "arrivalTime": "2024-10-31T17:22:46+01:00",
+      "departureTime": "2024-11-06T10:01:02+01:00",
+      "arrivalTime": "2024-11-06T10:06:02+01:00",
       "delivered": false,
-      "message_sent": true
+      "message_sent": false,
+      "message_report": "An exception during the sms deliver to  +390013 was found: <SendException {'message': 'No correct phone numbers', 'code': 13, 'url': None, 'http_method': None, 'invalid_numbers': [<smsapi.models.InvalidNumber object at 0x7e2832e6c860>]}>"
     },
     {
       "gsin": "40212345678955996420",
       "lengthInMeters": 5430,
-      "travelTimeInSeconds": 678,
+      "travelTimeInSeconds": 620,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -88,15 +89,16 @@
       },
       "arrivalLatitude": 43.75709,
       "arrivalLongitude": 10.4269,
-      "departureTime": "2024-10-31T17:24:26+01:00",
-      "arrivalTime": "2024-10-31T17:35:44+01:00",
+      "departureTime": "2024-11-06T10:07:42+01:00",
+      "arrivalTime": "2024-11-06T10:18:02+01:00",
       "delivered": false,
-      "message_sent": true
+      "message_sent": false,
+      "message_report": "An exception during the sms deliver to  +390012 was found: <SendException {'message': 'No correct phone numbers', 'code': 13, 'url': None, 'http_method': None, 'invalid_numbers': [<smsapi.models.InvalidNumber object at 0x7e2832e6dc10>]}>"
     },
     {
       "gsin": "40212345678955996419",
       "lengthInMeters": 993,
-      "travelTimeInSeconds": 182,
+      "travelTimeInSeconds": 176,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -119,17 +121,18 @@
       },
       "arrivalLatitude": 43.75897,
       "arrivalLongitude": 10.43622,
-      "departureTime": "2024-10-31T17:37:24+01:00",
-      "arrivalTime": "2024-10-31T17:40:26+01:00",
+      "departureTime": "2024-11-06T10:19:42+01:00",
+      "arrivalTime": "2024-11-06T10:22:37+01:00",
       "delivered": false,
-      "message_sent": true
+      "message_sent": false,
+      "message_report": "An exception during the sms deliver to  +390011 was found: <SendException {'message': 'No correct phone numbers', 'code': 13, 'url': None, 'http_method': None, 'invalid_numbers': [<smsapi.models.InvalidNumber object at 0x7e2832e6d220>]}>"
     },
     {
       "gsin": "40212345678955996418",
       "lengthInMeters": 3483,
-      "travelTimeInSeconds": 527,
-      "trafficDelayInSeconds": 65,
-      "trafficLengthInMeters": 964,
+      "travelTimeInSeconds": 427,
+      "trafficDelayInSeconds": 0,
+      "trafficLengthInMeters": 0,
       "departureAddress": {
         "address": "Via Carlo Collodi",
         "city": "San Giuliano Terme",
@@ -150,15 +153,16 @@
       },
       "arrivalLatitude": 43.74752,
       "arrivalLongitude": 10.46526,
-      "departureTime": "2024-10-31T17:42:06+01:00",
-      "arrivalTime": "2024-10-31T17:50:52+01:00",
+      "departureTime": "2024-11-06T10:24:17+01:00",
+      "arrivalTime": "2024-11-06T10:31:23+01:00",
       "delivered": false,
-      "message_sent": true
+      "message_sent": false,
+      "message_report": "An exception during the sms deliver to  +390010 was found: <SendException {'message': 'No correct phone numbers', 'code': 13, 'url': None, 'http_method': None, 'invalid_numbers': [<smsapi.models.InvalidNumber object at 0x7e2832f46e10>]}>"
     },
     {
       "gsin": "40212345678955996413",
-      "lengthInMeters": 9735,
-      "travelTimeInSeconds": 1002,
+      "lengthInMeters": 8885,
+      "travelTimeInSeconds": 879,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -181,15 +185,16 @@
       },
       "arrivalLatitude": 43.70579,
       "arrivalLongitude": 10.43988,
-      "departureTime": "2024-10-31T17:52:32+01:00",
-      "arrivalTime": "2024-10-31T18:09:13+01:00",
+      "departureTime": "2024-11-06T10:33:03+01:00",
+      "arrivalTime": "2024-11-06T10:47:41+01:00",
       "delivered": false,
-      "message_sent": true
+      "message_sent": false,
+      "message_report": "An exception during the sms deliver to  +39005 was found: <SendException {'message': 'No correct phone numbers', 'code': 13, 'url': None, 'http_method': None, 'invalid_numbers': [<smsapi.models.InvalidNumber object at 0x7e2832f46570>]}>"
     },
     {
       "gsin": "40212345678955996412",
       "lengthInMeters": 2189,
-      "travelTimeInSeconds": 328,
+      "travelTimeInSeconds": 285,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -212,15 +217,16 @@
       },
       "arrivalLatitude": 43.7064,
       "arrivalLongitude": 10.43256,
-      "departureTime": "2024-10-31T18:10:53+01:00",
-      "arrivalTime": "2024-10-31T18:16:21+01:00",
+      "departureTime": "2024-11-06T10:49:21+01:00",
+      "arrivalTime": "2024-11-06T10:54:05+01:00",
       "delivered": false,
-      "message_sent": true
+      "message_sent": false,
+      "message_report": "An exception during the sms deliver to  +39004 was found: <SendException {'message': 'No correct phone numbers', 'code': 13, 'url': None, 'http_method': None, 'invalid_numbers': [<smsapi.models.InvalidNumber object at 0x7e2832f46e10>]}>"
     },
     {
       "gsin": "40212345678955996411",
       "lengthInMeters": 2247,
-      "travelTimeInSeconds": 347,
+      "travelTimeInSeconds": 320,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -243,15 +249,16 @@
       },
       "arrivalLatitude": 43.71057,
       "arrivalLongitude": 10.41437,
-      "departureTime": "2024-10-31T18:18:01+01:00",
-      "arrivalTime": "2024-10-31T18:23:48+01:00",
+      "departureTime": "2024-11-06T10:55:45+01:00",
+      "arrivalTime": "2024-11-06T11:01:05+01:00",
       "delivered": false,
-      "message_sent": false
+      "message_sent": false,
+      "message_report": ""
     },
     {
       "gsin": "40212345678955996410",
       "lengthInMeters": 5125,
-      "travelTimeInSeconds": 821,
+      "travelTimeInSeconds": 747,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -274,15 +281,16 @@
       },
       "arrivalLatitude": 43.69086,
       "arrivalLongitude": 10.38389,
-      "departureTime": "2024-10-31T18:25:28+01:00",
-      "arrivalTime": "2024-10-31T18:39:09+01:00",
+      "departureTime": "2024-11-06T11:02:45+01:00",
+      "arrivalTime": "2024-11-06T11:15:12+01:00",
       "delivered": false,
-      "message_sent": false
+      "message_sent": false,
+      "message_report": ""
     },
     {
       "gsin": "40212345678955996415",
       "lengthInMeters": 5146,
-      "travelTimeInSeconds": 807,
+      "travelTimeInSeconds": 772,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -305,15 +313,16 @@
       },
       "arrivalLatitude": 43.69409,
       "arrivalLongitude": 10.42039,
-      "departureTime": "2024-10-31T18:40:49+01:00",
-      "arrivalTime": "2024-10-31T18:54:15+01:00",
+      "departureTime": "2024-11-06T11:16:52+01:00",
+      "arrivalTime": "2024-11-06T11:29:43+01:00",
       "delivered": false,
-      "message_sent": false
+      "message_sent": false,
+      "message_report": ""
     },
     {
       "gsin": "40212345678955996416",
       "lengthInMeters": 1268,
-      "travelTimeInSeconds": 392,
+      "travelTimeInSeconds": 377,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -336,15 +345,16 @@
       },
       "arrivalLatitude": 43.69762,
       "arrivalLongitude": 10.43009,
-      "departureTime": "2024-10-31T18:55:55+01:00",
-      "arrivalTime": "2024-10-31T19:02:27+01:00",
+      "departureTime": "2024-11-06T11:31:23+01:00",
+      "arrivalTime": "2024-11-06T11:37:40+01:00",
       "delivered": false,
-      "message_sent": false
+      "message_sent": false,
+      "message_report": ""
     },
     {
       "gsin": "40212345678955996417",
       "lengthInMeters": 1546,
-      "travelTimeInSeconds": 341,
+      "travelTimeInSeconds": 324,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -367,15 +377,16 @@
       },
       "arrivalLatitude": 43.6932,
       "arrivalLongitude": 10.44448,
-      "departureTime": "2024-10-31T19:04:07+01:00",
-      "arrivalTime": "2024-10-31T19:09:47+01:00",
+      "departureTime": "2024-11-06T11:39:20+01:00",
+      "arrivalTime": "2024-11-06T11:44:44+01:00",
       "delivered": false,
-      "message_sent": false
+      "message_sent": false,
+      "message_report": ""
     },
     {
       "gsin": "40212345678955996414",
       "lengthInMeters": 429,
-      "travelTimeInSeconds": 161,
+      "travelTimeInSeconds": 151,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -398,15 +409,16 @@
       },
       "arrivalLatitude": 43.69453,
       "arrivalLongitude": 10.44767,
-      "departureTime": "2024-10-31T19:11:27+01:00",
-      "arrivalTime": "2024-10-31T19:14:08+01:00",
+      "departureTime": "2024-11-06T11:46:24+01:00",
+      "arrivalTime": "2024-11-06T11:48:54+01:00",
       "delivered": false,
-      "message_sent": false
+      "message_sent": false,
+      "message_report": ""
     },
     {
       "gsin": "40212345678955996422",
       "lengthInMeters": 4155,
-      "travelTimeInSeconds": 630,
+      "travelTimeInSeconds": 608,
       "trafficDelayInSeconds": 0,
       "trafficLengthInMeters": 0,
       "departureAddress": {
@@ -429,10 +441,11 @@
       },
       "arrivalLatitude": 43.68445,
       "arrivalLongitude": 10.48887,
-      "departureTime": "2024-10-31T19:15:48+01:00",
-      "arrivalTime": "2024-10-31T19:26:17+01:00",
+      "departureTime": "2024-11-06T11:50:34+01:00",
+      "arrivalTime": "2024-11-06T12:00:41+01:00",
       "delivered": false,
-      "message_sent": false
+      "message_sent": false,
+      "message_report": ""
     }
   ],
   "delivered_stops": []
