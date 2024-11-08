@@ -1,5 +1,6 @@
 from typing import List
-from pydantic import BaseModel
+# from pydantic import BaseModel
+from model.base_model import BaseModel
 
 
 class Address(BaseModel):
@@ -10,9 +11,10 @@ class Address(BaseModel):
     city: str
     district: str
     house_number: str
-    zip_code: str   
-    telephone_number: str #"+3933332345678"
-   
+    zip_code: str
+    telephone_number: str  # "+3933332345678"
+
+
 class Delivery(BaseModel):
     '''This class contains an instance of the Address class and a gsin'''
     gsin: str

@@ -1,8 +1,10 @@
 from geopy import distance
 from model.travel_data import TravelData
+from model.response import Response, Delivery_ETA
+from model.delivery import Delivery
 from loguru import logger
 from datetime import datetime, timedelta
-from typing import Dict
+from typing import Dict, List
 
 
 class PostProcess():
@@ -11,12 +13,11 @@ class PostProcess():
 
     @staticmethod
     def associate_address(raw_travel_data: TravelData, ordered_travel_data: TravelData) -> TravelData:
-        
         """ this function associates the addresses from raw_travel_data to ordered_travel_data based on the geographical proximity of the stops.
             It calculates the distance between each stop's coordinates (departure and arrival) in both raw and ordered travel data, and matches the closest ones. 
             Then, it updates the addresses and gsin for the corresponding stops in ordered_travel_data and updates the summary with the first stop's departure address 
-            and the last stop's arrival address."""  
-           
+            and the last stop's arrival address."""
+
         for stop in raw_travel_data.stops:
             departure_latitude = stop.departureLatitude
             departure_longitude = stop.departureLongitude
@@ -53,37 +54,37 @@ class PostProcess():
             ordered_travel_data.summary.endAddress = ordered_travel_data.stops[-1].arrivalAddress
 
         return ordered_travel_data
-    
+
     @staticmethod
     def add_delay_to_time(time_obj: datetime, delay_in_seconds: int) -> datetime:
         """This method takes a datetime object and a delay in seconds. It applies the delay using timedelta, and 
-        returns the updated time as an ISO 8601 string."""        
-        
-        new_time_obj = time_obj + timedelta(seconds=delay_in_seconds)        
-        
+        returns the updated time as an ISO 8601 string."""
+
+        new_time_obj = time_obj + timedelta(seconds=delay_in_seconds)
+
         return new_time_obj
 
     # @staticmethod
     # def add_delay_to_time(time_str: str, delay_in_seconds: int) -> str:
         """This method takes an ISO-format time string and a delay in seconds. It converts the time string to a datetime object,
             applies the delay using timedelta, and returns the updated time as an ISO-format string."""
-        
-        
+
         # time_format = "%Y-%m-%dT%H:%M:%S%z"
         # time_obj = datetime.strptime(time_str, time_format)
         # new_time_obj = time_obj + timedelta(seconds=delay_in_seconds)
-        # formatted_time_str = new_time_obj.strftime("%Y-%m-%dT%H:%M:%S%z")        
+        # formatted_time_str = new_time_obj.strftime("%Y-%m-%dT%H:%M:%S%z")
         # formatted_time_with_colon = formatted_time_str[:-2] + ":" + formatted_time_str[-2:]
-        
+
         # return formatted_time_with_colon
-        #return new_time_obj.strptime(time_format)
+        # return new_time_obj.strptime(time_format)
 
     @staticmethod
     def update_eta(travel_data: TravelData, zip_code_delay: Dict[str, int]) -> TravelData:
         """this function updates ETAs with the delay given by every zip code"""
 
         if not travel_data.stops:
-            logger.info("No stops available in travel_data. Skipping ETA update.")
+            logger.info(
+                "No stops available in travel_data. Skipping ETA update.")
             return travel_data
 
         for i in range(len(travel_data.stops)-1):
@@ -98,3 +99,25 @@ class PostProcess():
                     arr_time, delay)
         travel_data.summary.arrivalTime = travel_data.stops[-1].arrivalTime
         return travel_data
+
+    @staticmethod
+    def create_response(travel_data: TravelData) -> Response:
+
+        delivery = []
+        for stop in travel_data.stops:
+            delivery_eta = Delivery_ETA(**{
+                'gsin': stop.gsin,
+                'address': stop.arrivalAddress,
+                'eta': stop.arrivalTime,
+                'delivered': stop.delivered,
+                'deliverd_at': stop.delivered_at
+            })
+            delivery.append(delivery_eta)
+
+        response = Response(**{
+            'ginc': travel_data.ginc,
+            'personal_id': travel_data.personal_id,
+            'delivery': delivery
+        })
+        logger.info(response)
+        return response

@@ -19,6 +19,8 @@ mongoengine = "^0.29.0"
 apscheduler = "^3.10.4"
 smsapi-client = "^2.9.6"
 python-multipart = "^0.0.17"
+py-bcrypt = "^0.4"
+motor = "^3.6.0"
 
 
 [build-system]

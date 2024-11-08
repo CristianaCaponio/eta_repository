@@ -5,9 +5,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from loguru import logger
+from controller.db.db_setting import ROUTE_DBSettings
 
 from api.eta_calculation_api import eta_api_router
 from settings import Settings
+import motor.motor_asyncio
 
 import time
 import asyncio
@@ -53,86 +55,53 @@ app.add_middleware(
 #     'input.topic': os.environ.get('INPUT_TOPIC_NAME', 'eta_calculation')
 # }
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    '''this code is executed before the application starts taking requests 
-    and right after it finishes handling requests, it covers the whole application lifespan'''
-    logger.info("the application is ready.")
-    yield
-    logger.info("the application shut down.")
-    logger.info("Done. Bye.")
-    
-    
-# @app.lifespan("startup")
-# async def startup_event() -> None:
-#     """
-#     Register events to initialize/destroy global state (accessible in all
-#     the request via request.app.state
-#     """
 
-#     logger.info("Secure storage service ready.")
+@app.on_event("startup")
+async def startup_event() -> None:
+    """
+    Register events to initialize/destroy global state (accessible in all
+    the request via request.app.state
+    """
 
- 
-#     """
-#     Register events to initialize/destroy global state (accessible in all
-#     the request via request.app.state
-#     """
-#     rt_db_settings = RT_DBSettings()
-#     #user_db_settings = UserDBSettings()
-#     client = motor.motor_asyncio.AsyncIOMotorClient(rt_db_settings.connection_uri,
-#                                                     connect=True,
-#                                                     tz_aware=True)  # connect now adn detect connection issues
-#     # retreive the database specified in the connection URI
-#     # user = motor.motor_asyncio.AsyncIOMotorClient(user_db_settings.connection_uri,
-#     #                                                 connect=True,
-#     #                                                 tz_aware=True)
-#     rt_db = client.get_default_database()
-#     #user_db = user.get_default_database()
+    logger.info("Secure storage service ready.")
 
-#     app.state.kafka_controller = KafkaController(
-#         {"bootstrap.servers": os.environ.get('BOOTSTRAP_SERVERS', 'localhost:9092')})
-#     app.state.kafka_controller.create_topic(application_conf['input.topic'])
+    """
+    Register events to initialize/destroy global state (accessible in all
+    the request via request.app.state
+    """
+    route_db_settings = ROUTE_DBSettings()
+    client = motor.motor_asyncio.AsyncIOMotorClient(route_db_settings.connection_uri,
+                                                    connect=True,
+                                                    tz_aware=True)  # connect now adn detect connection issues
 
-#     logger.info("Starting up. Initializing Database, producer, and consumer")
-#     app.state.producer = AIOProducer(producer_settings)
-#     app.state.consumer = AIOConsumer(configs=consumer_settings_,
-#                                      topics=[
-#                                          application_conf['input.topic'],
-#                                          'FLEETONE'],
-#                                      db=rt_db,
-#                                      producer=app.state.producer)
+    route_db = client.get_default_database()
 
-#     app.state.rt_db = rt_db
-#     #app.state.user_db = user_db
-#     # loop = asyncio.get_event_loop()
-#     # loop.create_task(real_time_loop())
-#     # loop.run_forever()
-#     logger.info("RT service ready.")
+    # app.state.kafka_controller = KafkaController(
+    #     {"bootstrap.servers": os.environ.get('BOOTSTRAP_SERVERS', 'localhost:9092')})
+    # app.state.kafka_controller.create_topic(application_conf['input.topic'])
+
+    # logger.info("Starting up. Initializing Database, producer, and consumer")
+    # app.state.producer = AIOProducer(producer_settings)
+    # app.state.consumer = AIOConsumer(configs=consumer_settings_,
+    #                                  topics=[
+    #                                      application_conf['input.topic'],
+    #                                      'FLEETONE'],
+    #                                  db=rt_db,
+    #                                  producer=app.state.producer)
+
+    app.state.route_db = route_db
+    logger.info("RT service ready.")
 
 
+@app.on_event("shutdown")
+async def shutdown_event() -> None:
+    """
+    Shuting down. Waiting for consumer to stop
+    """
+    logger.info("Shuting down. Waiting for consumer to stop...")
+    app.state.consumer.close()
 
-
-
-# @app.lifespan("shutdown")
-# async def shutdown_event() -> None:
-#     """
-#     Shuting down. Waiting for consumer to stop
-#     """
-#     logger.info("Shuting down. Waiting for consumer to stop...")
-#     app.state.consumer.close()
-
-#     logger.info("Done. Bye")
-
-
-# async def real_time_loop():
-#     while True:
-#         try:
-#             #await app.state.consumer.poll_loop()
-#             await app.state.consumer.poll_loop()
-#             logger.info('test')
-#             time.sleep(10)
-#         except Exception as ex:
-#             logger.error(f'main: error in while true loop: {ex}')
+    logger.info("Done. Bye")
 
 
 if __name__ == "__main__":
@@ -141,4 +110,3 @@ if __name__ == "__main__":
                 port=settings.port,
                 log_level=settings.log_level,
                 reload=settings.hot_reload)
-

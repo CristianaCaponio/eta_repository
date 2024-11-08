@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+# from pydantic import BaseModel
+from model.base_model import BaseModel
 from datetime import datetime
 
 
