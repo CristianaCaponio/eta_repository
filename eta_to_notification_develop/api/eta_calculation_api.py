@@ -10,7 +10,6 @@ from model.travel_data import TravelData
 from model.response import Response
 from model.device_message import DeliveryMessage
 from controller.db.follow_track_db import FollowTrackDB
-from utils.update_service import RouteUpdate
 from loguru import logger
 import json
 from motor.motor_asyncio import AsyncIOMotorDatabase
@@ -63,7 +62,7 @@ async def get_route_object_by_ginc(ginc: str,
                             detail=f"route information not found.")
 
 
-@eta_api_router.post("/eta/calculation", status_code=status.HTTP_201_CREATED)
+@eta_api_router.post("/route_calculation", status_code=status.HTTP_201_CREATED)
 async def eta_calculation(delivery_list: List[Delivery]) -> TravelData:
     """this is the api used for ETA calculation. It takes in input a list of addresses with a gsin and return a TravelData object with TomTom information and time delays 
     provided by every zip code"""
@@ -74,7 +73,7 @@ async def eta_calculation(delivery_list: List[Delivery]) -> TravelData:
     ordered_travel_data = TomTom.order_travel_data(
         coordinates)
 
-    # logger.info(ordered_travel_data)
+    # logger.info(ordered_travel_data)    ##########
 
     complete_travel_data = PostProcess.associate_address(
         raw_travel_data, ordered_travel_data)
@@ -93,22 +92,37 @@ async def eta_calculation(delivery_list: List[Delivery]) -> TravelData:
     return delay_travel_data
 
 
+@eta_api_router.post("/route_delete/", status_code=status.HTTP_200_OK)
+async def delete_trace(ginc: str,
+                       route_db: AsyncIOMotorDatabase = ROUTE_DBDependency):
+    delete = await FollowTrackDB.delete_route_object(route_db, ginc)
+    if delete:
+        logger.info(f"object with ginc:{ginc} deleted")
+        return "deleted"
+    else:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="error during the deleting process")
+
+
 @eta_api_router.post("/route_update/", status_code=status.HTTP_201_CREATED)
 async def eta_modification(update: DeliveryMessage,
                            route_db: AsyncIOMotorDatabase = ROUTE_DBDependency) -> Response:
     """this is the api used to trigger again the TomTom service when a delivery is made. It takes in input a DeliveryMessage object 
     and returns an updated Response Object"""
 
-    old_travel_data = await FollowTrackDB.get_route_object(route_db, update.ginc)
+    list_travel_data = await FollowTrackDB.get_route_object(route_db, update.ginc)
+    old_travel_data = list_travel_data[0]
 
     if not old_travel_data or old_travel_data is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"route information not found.")
 
-    new_travel_data = RouteUpdate.update_route(old_travel_data, update)
+    new_travel_data = TomTomRecalculation.update_route(old_travel_data, update)
+
+    # logger.info(new_travel_data)
+
     ordered_travel_data = TomTomRecalculation.order_travel_data(
         new_travel_data)
-    # logger.info(f"the travel data of the api are {travel_data}")
 
     with open("./eta_to_notification_develop/zip_code.json") as cap_file:
         cap_delays = json.load(cap_file)
@@ -118,6 +132,12 @@ async def eta_modification(update: DeliveryMessage,
 
     message_sending = MessageSending.check_time_and_send(delay_travel_data)
     ###########
-    # save_response = await FollowTrackDB.add_new_object(route_db, delay_travel_data)
-    ##########
-    return delay_travel_data
+    save_response = await FollowTrackDB.update_route_object(route_db, delay_travel_data)
+    if save_response:
+        logger.info("trace updated in db")
+        response = PostProcess.create_response(delay_travel_data)
+        return response
+    else:
+        logger.info("error in store trace inside db")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail=f"error in store trace inside db")

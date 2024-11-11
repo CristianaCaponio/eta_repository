@@ -15,7 +15,7 @@ import time
 import asyncio
 
 settings = Settings()
-api_prefix = f'/api/v{settings.api_version_str}'
+api_prefix = f'/follow_track_api'
 app = FastAPI(title=settings.project_name,
               version=settings.api_version_str,
               description="Component for eta calculation",

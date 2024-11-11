@@ -40,19 +40,19 @@ class FollowTrackDB(object):
                                                                                                1
                                                                                                )]
 
-            logger.info(result)
+            # logger.info(result)
             return result
         except Exception as ex:
             logger.error(f'follow_track_db.get_route_object, error:{ex}')
             return None
 
     @staticmethod
-    async def delete_route_object(db: AsyncIOMotorDatabase, id: str) -> bool:
+    async def delete_route_object(db: AsyncIOMotorDatabase, ginc: str) -> bool:
         '''
         delete 
         '''
         try:
-            result = await delete_entry(db, COLLECTION_NAME, {'id': id})
+            result = await delete_entry(db, COLLECTION_NAME, {'ginc': ginc})
             if result is not None:
                 return True
             return False
@@ -67,7 +67,7 @@ class FollowTrackDB(object):
         """
         try:
             new_route_object_dict = new_route_object.mongo()
-            result = await update_entry_atomic(db, COLLECTION_NAME, {'id': new_route_object.ginc}, new_route_object_dict)
+            result = await update_entry_atomic(db, COLLECTION_NAME, {'ginc': new_route_object.ginc}, new_route_object_dict)
             if result is not None:
                 return True
             return False

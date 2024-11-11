@@ -104,15 +104,28 @@ class PostProcess():
     def create_response(travel_data: TravelData) -> Response:
 
         delivery = []
-        for stop in travel_data.stops:
-            delivery_eta = Delivery_ETA(**{
-                'gsin': stop.gsin,
-                'address': stop.arrivalAddress,
-                'eta': stop.arrivalTime,
-                'delivered': stop.delivered,
-                'deliverd_at': stop.delivered_at
-            })
-            delivery.append(delivery_eta)
+        if travel_data.delivered_stops:
+            for delivered in travel_data.delivered_stops:
+                logger.info(delivered)
+                delivery_eta = Delivery_ETA(**{
+                    'gsin': delivered.gsin,
+                    'address': delivered.arrivalAddress,
+                    'eta': delivered.arrivalTime,
+                    'delivered': delivered.delivered,
+                    'deliverd_at': delivered.delivered_at
+                })
+                delivery.append(delivery_eta)
+
+        if travel_data.stops:
+            for stop in travel_data.stops:
+                delivery_eta = Delivery_ETA(**{
+                    'gsin': stop.gsin,
+                    'address': stop.arrivalAddress,
+                    'eta': stop.arrivalTime,
+                    'delivered': stop.delivered,
+                    'deliverd_at': stop.delivered_at
+                })
+                delivery.append(delivery_eta)
 
         response = Response(**{
             'ginc': travel_data.ginc,
