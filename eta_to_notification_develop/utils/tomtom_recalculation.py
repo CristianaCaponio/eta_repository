@@ -4,6 +4,7 @@ from model.device_message import DeliveryMessage
 from datetime import datetime
 from loguru import logger
 import os
+import pytz
 
 """questo è un test. Sto lasciando i nomi dei metodi uguali a quelli della classe TomTom per fare il confronto e capire come e se ottimizzare"""
 
@@ -142,7 +143,10 @@ class TomTomRecalculation:
         for stop in travel_data.stops:
             if stop.gsin == gsin:
                 if stop.delivered is False:
-                    stop.delivered_at = delivered_at
+                    logger.info(f"il precedente delivered_at è nel formato {delivered_at}")
+                    stop.delivered_at = delivered_at                  
+
+                    logger.info(f"il delivered_at è nel formato {stop.delivered_at}")  
                     stop.delivered = True
                 else:
                     logger.info(
@@ -150,6 +154,7 @@ class TomTomRecalculation:
                     return travel_data
 
         for stop in travel_data.delivered_stops:
+            logger.info(f"Stop GSIN {stop.gsin} - Delivered_at: {stop.delivered_at}")
             if stop.gsin == gsin:
                 logger.info(
                     "not possible to update route file, shipment already delivered")
@@ -158,7 +163,7 @@ class TomTomRecalculation:
         new_travel_data = TomTomRecalculation.update_travel_data_delivers(
             travel_data)
 
-        # logger.info(new_travel_data)
+        logger.info(f"il travel data con il delivered_at è questo: {new_travel_data}")
         return new_travel_data
 
     @staticmethod

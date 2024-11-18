@@ -79,7 +79,7 @@ class PostProcess():
         # return new_time_obj.strptime(time_format)
 
     @staticmethod
-    def update_eta(travel_data: TravelData, zip_code_delay: Dict[str, int]) -> TravelData:
+    def update_eta(travel_data: TravelData, zip_code_delay: Dict[str, int], default_delay: int)  -> TravelData:
         """this function updates ETAs with the delay given by every zip code"""
 
         if not travel_data.stops:
@@ -89,7 +89,9 @@ class PostProcess():
 
         for i in range(len(travel_data.stops)-1):
             zip_code = travel_data.stops[i+1].departureAddress.zip_code
-            delay = zip_code_delay[f"{zip_code}"]
+            #delay = zip_code_delay[f"{zip_code}"]
+            delay = zip_code_delay.get(zip_code,default_delay)
+
             for y in range(i+1, len(travel_data.stops)):
                 dep_time = travel_data.stops[y].departureTime
                 arr_time = travel_data.stops[y].arrivalTime

@@ -34,7 +34,7 @@ async def create_upload_file(file: UploadFile,
         cap_delays = json.load(cap_file)
         # logger.info(cap_delays)
     delay_travel_data = PostProcess.update_eta(
-        complete_travel_data, cap_delays)
+        complete_travel_data, cap_delays, default_delay = 100)
     delay_travel_data.ginc = trace_id
     # logger.info(delay_travel_data)
     message_sending = MessageSending.check_time_and_send(delay_travel_data)
@@ -85,7 +85,7 @@ async def eta_calculation(delivery_list: List[Delivery]) -> TravelData:
         logger.info(cap_delays)
 
     delay_travel_data = PostProcess.update_eta(
-        complete_travel_data, cap_delays)
+        complete_travel_data, cap_delays, default_delay = 100)
 
     message_sending = MessageSending.check_time_and_send(delay_travel_data)
 
@@ -119,16 +119,18 @@ async def eta_modification(update: DeliveryMessage,
 
     new_travel_data = TomTomRecalculation.update_route(old_travel_data, update)
 
-    # logger.info(new_travel_data)
+    logger.info(f"sono dentro eta_calculation_api e i travel data dopo l'update_route sono {new_travel_data}")
 
     ordered_travel_data = TomTomRecalculation.order_travel_data(
         new_travel_data)
+    
+    logger.info(f"sono dentro eta_calculation_api e i travel data dopo l'order tarvel data sono {new_travel_data}")
 
     with open("./eta_to_notification_develop/zip_code.json") as cap_file:
         cap_delays = json.load(cap_file)
         logger.info(cap_delays)
 
-    delay_travel_data = PostProcess.update_eta(ordered_travel_data, cap_delays)
+    delay_travel_data = PostProcess.update_eta(ordered_travel_data, cap_delays, default_delay = 100)
 
     message_sending = MessageSending.check_time_and_send(delay_travel_data)
     ###########
