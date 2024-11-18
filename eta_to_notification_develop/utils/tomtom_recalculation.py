@@ -1,4 +1,5 @@
 import requests
+from utils.message_trigger_service import MessageSending
 from model.travel_data import TravelData
 from model.device_message import DeliveryMessage
 from datetime import datetime
@@ -148,6 +149,7 @@ class TomTomRecalculation:
 
                     logger.info(f"il delivered_at è nel formato {stop.delivered_at}")  
                     stop.delivered = True
+                    MessageSending.delivery_occurred_message(stop)
                 else:
                     logger.info(
                         "not possible to update route file, shipment already delivered")

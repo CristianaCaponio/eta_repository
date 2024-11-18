@@ -81,7 +81,7 @@ class PostProcess():
     @staticmethod
     def update_eta(travel_data: TravelData, zip_code_delay: Dict[str, int], default_delay: int)  -> TravelData:
         """this function updates ETAs with the delay given by every zip code"""
-
+        logger.info(f'il cap delay di default è  {default_delay}')
         if not travel_data.stops:
             logger.info(
                 "No stops available in travel_data. Skipping ETA update.")
@@ -102,37 +102,73 @@ class PostProcess():
         travel_data.summary.arrivalTime = travel_data.stops[-1].arrivalTime
         return travel_data
 
+    # @staticmethod
+    # def create_response(travel_data: TravelData) -> Response:
+
+    #     delivery = []
+    #     if travel_data.delivered_stops:
+    #         for delivered in travel_data.delivered_stops:
+    #             logger.info(delivered)
+    #             delivery_eta = Delivery_ETA(**{
+    #                 'gsin': delivered.gsin,
+    #                 'address': delivered.arrivalAddress,
+    #                 'eta': delivered.arrivalTime,
+    #                 'delivered': delivered.delivered,
+    #                 'deliverd_at': delivered.delivered_at
+    #             })
+    #             delivery.append(delivery_eta)
+
+    #     if travel_data.stops:
+    #         for stop in travel_data.stops:
+    #             delivery_eta = Delivery_ETA(**{
+    #                 'gsin': stop.gsin,
+    #                 'address': stop.arrivalAddress,
+    #                 'eta': stop.arrivalTime,
+    #                 'delivered': stop.delivered,
+    #                 'delivered_at': stop.delivered_at
+    #             })
+    #             delivery.append(delivery_eta)
+
+    #     response = Response(**{
+    #         'ginc': travel_data.ginc,
+    #         'personal_id': travel_data.personal_id,
+    #         'delivery': delivery
+    #     })
+    #     logger.info(response)
+    #     return response
     @staticmethod
-    def create_response(travel_data: TravelData) -> Response:
-
-        delivery = []
+    def process_stops(travel_data: TravelData) -> list[Delivery_ETA]:
+        
+        result = []
+        # Combina fermate consegnate e non consegnate
+        all_stops = []
         if travel_data.delivered_stops:
-            for delivered in travel_data.delivered_stops:
-                logger.info(delivered)
-                delivery_eta = Delivery_ETA(**{
-                    'gsin': delivered.gsin,
-                    'address': delivered.arrivalAddress,
-                    'eta': delivered.arrivalTime,
-                    'delivered': delivered.delivered,
-                    'deliverd_at': delivered.delivered_at
-                })
-                delivery.append(delivery_eta)
-
+            all_stops.extend(travel_data.delivered_stops)
         if travel_data.stops:
-            for stop in travel_data.stops:
+            all_stops.extend(travel_data.stops)
+
+        # Processa ogni fermata
+        for stop in all_stops:
+            try:
                 delivery_eta = Delivery_ETA(**{
                     'gsin': stop.gsin,
                     'address': stop.arrivalAddress,
                     'eta': stop.arrivalTime,
                     'delivered': stop.delivered,
-                    'deliverd_at': stop.delivered_at
+                    'delivered_at': stop.delivered_at
                 })
-                delivery.append(delivery_eta)
+                result.append(delivery_eta)
+            except AttributeError as e:
+                logger.error(f"Errore durante la creazione di Delivery_ETA per {stop}: {e}")
+        return result
+    
+    @staticmethod
+    def create_response(travel_data: TravelData) -> Response:
+        delivery = PostProcess.process_stops(travel_data)
 
         response = Response(**{
             'ginc': travel_data.ginc,
             'personal_id': travel_data.personal_id,
             'delivery': delivery
         })
-        logger.info(response)
         return response
