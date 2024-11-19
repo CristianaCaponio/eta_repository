@@ -7,19 +7,38 @@ from loguru import logger
 import os
 import pytz
 
-"""questo è un test. Sto lasciando i nomi dei metodi uguali a quelli della classe TomTom per fare il confronto e capire come e se ottimizzare"""
-
-
 class TomTomRecalculation:
-    """in this class are stored all the functions related to TomTom and the population of TravelData with the ETAs
-    and information provided by tomTom routing api after the first request"""
-
+    """
+    This class is responsible for recalculating the route for a specific travel based on updated delivery status 
+    and coordinates. It interacts with the TomTom API to fetch the updated route and estimated times of arrival (ETAs).
+    
+    Key Responsibilities:
+    1. Updating travel data with the delivery status and recalculating the route.
+    2. Making requests to the TomTom API to get route details, wxcepting for the computation of the best route order.
+    3. Parsing the response from TomTom to update the travel data and stop details with accurate ETAs.
+    4. Updating the status of delivered stops and reordering the route accordingly.
+    """
+    
     @staticmethod
     def order_travel_data(travel_data: TravelData) -> TravelData:
-        """this function takes in input a list of strings (the coordinates in string format) and returns a TravelData object.
-        I   t recalls all the following functions to create the coordinates string with the format requested by TomTom url, to make the request to TomTom
-            and to parse the response in order to obtain a TravelData object populated with all TomTom informations and eta calculations"""
+        """
+        Updates the delivery status of a specific order and recalculates route details.
 
+        Steps:
+        1. Check if any stop is not delivered.
+        2. If undelivered stops exist, updates the travel data and calls TomTom's API.
+        3. Recalculates the route using TomTom’s services.
+        4. Adjusts the ETA based on the updated route data.
+        
+        Args:
+            travel_data (TravelData): The travel data containing the current route and stops.
+        
+        Returns:
+            TravelData: The updated travel data with new ETAs and route details.
+        
+        Raises:
+            Exception: If no undelivered stops are found or an issue occurs during request/response handling.
+        """
         if travel_data.stops:
 
             new_travel_data = TomTomRecalculation.update_travel_data_delivers(
@@ -30,7 +49,6 @@ class TomTomRecalculation:
             ordered_travel_data = TomTomRecalculation.parse_tomtom_response(
                 json_response, new_travel_data)
             return ordered_travel_data
-
         else:
             logger.info("All deliveries were done")
             return travel_data
@@ -38,8 +56,17 @@ class TomTomRecalculation:
     @staticmethod
     def create_request_string(travel_data: TravelData) -> str:
         """
-        Creates a request string for TomTom API based on a list of stops. If 'delivered' is True, only the
-        departure coordinates of the first undelivered stop and the arrival coordinates of undelivered stops are used.
+        Creates the request string to call the TomTom API for recalculating the route.
+
+        Steps:
+        1. Collects the departure and arrival coordinates for all undelivered stops.
+        2. Builds the request URL for the API call.
+
+        Args:
+            travel_data (TravelData): The travel data containing the current stops.
+
+        Returns:
+            str: The formatted request string for the TomTom API.
         """
 
         departure_coordinates = None
@@ -52,9 +79,8 @@ class TomTomRecalculation:
                 if departure_coordinates is None:
                     departure_coordinates = [
                         single_stop.departureLatitude, single_stop.departureLongitude]
-                    logger.info(f"il departure_coordinate è {departure_coordinates}")  # nopep8
-
-                    # logger.info(f"i delivered dentro l'if è {single_stop.delivered}")
+                    logger.info(f"the departure coordinate is {departure_coordinates}")  # nopep8
+                   
                 arrival_coordinates.append(
                     [single_stop.arrivalLatitude, single_stop.arrivalLongitude])
 
@@ -74,7 +100,23 @@ class TomTomRecalculation:
 
     @staticmethod
     def tomtom_request(request_params: str) -> TravelData:
-        """this function is used to make the request to TomTom and returns a json with the TomTom format"""
+        """
+        Sends a request to the TomTom API to get route details.
+
+        Steps:
+        1. Builds the full URL using the base URL, request parameters, and API key.
+        2. Sends the GET request to TomTom's API and processes the response.
+
+        Args:
+            request_params (str): The request parameters to be appended to the TomTom URL.
+
+        Returns:
+            TravelData: The updated travel data returned from TomTom’s API.
+
+        Raises:
+            ValueError: If the TomTom API key is not set.
+            requests.exceptions.RequestException: If there's an issue with the HTTP request.
+        """
 
         baseUrl = "https://api.tomtom.com/routing/1/calculateRoute/"
         API_KEY = os.getenv("TOMTOM_API_KEY")
@@ -94,10 +136,23 @@ class TomTomRecalculation:
         else:
             return None
 
+
     @staticmethod
     def parse_tomtom_response(json_response: dict, travel_data: TravelData) -> TravelData:
-        """This function parses the response provided by TomTom and modifies the existing TravelData object with its data."""
+        """
+        Parses the response from TomTom and updates the travel data with route details.
 
+        Steps:
+        1. Extracts route and leg summary data (distance, time, delays, etc.) from the response.
+        2. Updates the travel data with this information, including start and end times.
+
+        Args:
+            json_response (dict): The JSON response returned by the TomTom API.
+            travel_data (TravelData): The travel data to be updated with the new route information.
+
+        Returns:
+            TravelData: The updated travel data with the parsed route details.
+        """
         tomtom_length_in_meters = json_response["routes"][0]["summary"]["lengthInMeters"]
         tomtom_travel_time_in_seconds = json_response["routes"][0]["summary"]["travelTimeInSeconds"]
         tomtom_traffic_delay_in_seconds = json_response["routes"][0]["summary"]["trafficDelayInSeconds"]
@@ -112,9 +167,9 @@ class TomTomRecalculation:
         travel_data.summary.trafficDelayInSeconds = tomtom_traffic_delay_in_seconds
         travel_data.summary.trafficLengthInMeters = tomtom_traffic_length_in_meters
         travel_data.summary.departureTime = start_time_iso
-        logger.info(f"il departure time del summary è {travel_data.summary.departureTime}")  # nopep8
+        # logger.info(f"the departure time of the summary is {travel_data.summary.departureTime}")  # nopep8
         travel_data.summary.arrivalTime = end_time_iso
-        logger.info(f"l'arrival time del summary è {travel_data.summary.arrivalTime}")  # nopep8
+        # logger.info(f"the arrival time of the summary is {travel_data.summary.arrivalTime}")  # nopep8
 
         for leg_index, leg_data in enumerate(json_response["routes"][0]["legs"]):
             stop = travel_data.stops[leg_index]
@@ -125,18 +180,33 @@ class TomTomRecalculation:
             stop.trafficLengthInMeters = leg_data["summary"]["trafficLengthInMeters"]
             stop.departureTime = datetime.fromisoformat(
                 leg_data["summary"]["departureTime"])
-            logger.info(f"il departure time dello stop è {stop.departureTime}")
+            # logger.info(f"the departure time of the stop is {stop.departureTime}")
             stop.arrivalTime = datetime.fromisoformat(
                 leg_data["summary"]["arrivalTime"])
-            logger.info(f"l'arrival time dello stop è {stop.arrivalTime}")
+            # logger.info(f"the arrival time of the stop is {stop.arrivalTime}")
 
         travel_data.summary.startAddress = travel_data.stops[0].departureAddress
         travel_data.summary.endAddress = travel_data.stops[-1].arrivalAddress
 
         return travel_data
 
+
     @staticmethod
     def update_route(travel_data: TravelData, update: DeliveryMessage) -> TravelData:
+        """
+        Updates the route with delivery information for a specific stop.
+
+        Steps:
+        1. Finds the stop based on the GSIN and updates the delivered status and delivery time.
+        2. Recalculates the route if the stop is successfully marked as delivered.
+
+        Args:
+            travel_data (TravelData): The travel data containing the stops.
+            update (DeliveryMessage): The message containing delivery information (ginc, gsin and delivery time).
+
+        Returns:
+            TravelData: The updated travel data with the new delivery details.
+        """
 
         gsin = update.gsin
         delivered_at = update.delivery_time
@@ -144,10 +214,8 @@ class TomTomRecalculation:
         for stop in travel_data.stops:
             if stop.gsin == gsin:
                 if stop.delivered is False:
-                    logger.info(f"il precedente delivered_at è nel formato {delivered_at}")
-                    stop.delivered_at = delivered_at                  
-
-                    logger.info(f"il delivered_at è nel formato {stop.delivered_at}")  
+                  
+                    stop.delivered_at = delivered_at            
                     stop.delivered = True
                     MessageSending.delivery_occurred_message(stop)
                 else:
@@ -165,20 +233,25 @@ class TomTomRecalculation:
         new_travel_data = TomTomRecalculation.update_travel_data_delivers(
             travel_data)
 
-        logger.info(f"il travel data con il delivered_at è questo: {new_travel_data}")
+        #logger.info(f"il travel data inside tomtom_recalculation after the update is: {new_travel_data}")
         return new_travel_data
 
     @staticmethod
     def update_travel_data_delivers(travel_data: TravelData) -> TravelData:
+        """
+        Updates the travel data by moving delivered stops to a separate list called 'delivered_stops'.
 
-        # for i in range(travel_data.stops.__len__()):
-        #     logger.info(f"la lunghezza è {travel_data.stops.__len__()}")
-        #     if travel_data.stops[i].delivered:
-        #         travel_data.delivered_stops.append(travel_data.stops[i])
-        #         logger.info(travel_data.delivered_stops)
-        #         del travel_data.stops[i]
-        #         logger.info(i)
+        Steps:
+        1. Iterates through the stops to identify the delivered ones.
+        2. Moves delivered stops to the `delivered_stops` list and removes them from `stops`.
 
+        Args:
+            travel_data (TravelData): The travel data containing the stops.
+
+        Returns:
+            TravelData: The updated travel data with delivered stops moved to `delivered_stops`.
+        """
+        
         for stop in travel_data.stops:
             if stop.delivered:
                 travel_data.delivered_stops.append(stop)

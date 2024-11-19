@@ -8,24 +8,51 @@ from geopy.extra.rate_limiter import RateLimiter
 from loguru import logger
 import csv
 import io
-import json
-
 
 class PreProcess():
-    """This class is used to create the string of coordinates that will be included in tomTom url and to populate TravelData before the eta calculation"""
+    """
+    The `PreProcess` class provides functionality to prepare and preprocess delivery data, including:
+    - Converting delivery addresses to geographical coordinates.
+    - Populating `TravelData` objects with necessary details for a delivery route.
+    - Parsing CSV files containing delivery information.
+
+    The class is primarily responsible for transforming input delivery data into the appropriate format 
+    required for routing and travel calculations.
+
+    Key Responsibilities:
+    1. **Coordinate Conversion**: Convert a list of delivery addresses into geographic coordinates (latitude, longitude).
+    2. **Travel Data Population**: Populate a `TravelData` object with route summaries and stop details derived from delivery addresses.
+    3. **CSV Parsing**: Parse CSV files containing delivery information, converting rows into structured `Delivery` objects with associated metadata.
+    """
 
     @staticmethod
     def populate_travel_data(delivery_list: List[Delivery]) -> Tuple[List[str], TravelData]:
-        """this function takes in input a list of Delivery (with a gsin and a full address) and returns a Tuple with a list of coordinates in str format and 
-            a TravelData object populated with coordinates and addresses. This function calls address_to_coordinates_converter to convert addresses into coordinates
-            and then both data are used to populate TravelData"""
+        """
+        Converts a list of `Delivery` objects into `TravelData`, including route summary and stops.
+
+        This method:
+        1. Converts the addresses from the `Delivery` objects into geographic coordinates.
+        2. Constructs a summary (start and end coordinates) for the travel data.
+        3. Creates `StopSummary` objects for each leg of the journey (from one delivery to the next).
+
+        Args:
+            delivery_list (List[Delivery]): A list of `Delivery` objects containing delivery details.
+
+        Returns:
+            Tuple[List[str], TravelData]: A tuple consisting of:
+                - A list of coordinates (latitude, longitude).
+                - A `TravelData` object with summary and stops information.
+
+        Raises:
+            ValueError: If the `delivery_list` does not contain at least two addresses for start and end.
+        """
 
         coordinates = PreProcess.address_to_coordinates_converter(
             delivery_list)
 
         if len(coordinates) < 2:
             raise ValueError(
-                "La lista deve contenere almeno due indirizzi per start e end.")
+                "This list must contain at least two addresses: one for the departure and one another for the arrival.")
 
         new_summary = Summary(
             startLatitude=coordinates[0][0],
@@ -56,13 +83,27 @@ class PreProcess():
             stops=new_stops,
             delivered_stops=[]
         )
-        logger.info(f"travel data in preprocess_service: {travel_data}")
-
+        #logger.info(f"travel data in preprocess_service: {travel_data}")
         return coordinates, travel_data
 
     @staticmethod
     def address_to_coordinates_converter(delivery_list: List[Delivery]) -> List[str]:
-        """this function takes in input a list of Delivery (with a gsin and a full address) and returns a string of coordinates in str format"""
+        """
+        Converts delivery addresses into geographic coordinates (latitude, longitude) using geocoding.
+
+        This method:
+        1. Uses the `ArcGIS` geocoder to look up the coordinates for each delivery address.
+        2. Returns the list of coordinates as tuples of latitude and longitude.
+
+        Args:
+            delivery_list (List[Delivery]): A list of `Delivery` objects containing address details.
+
+        Returns:
+            List[str]: A list of coordinates (latitude, longitude) for each address in the delivery list.
+
+        Raises:
+            ValueError: If any address cannot be geocoded.
+        """
 
         request = os.environ.get("USER_AGENT", "my_agent")
         geolocator = ArcGIS(user_agent=request)
@@ -70,6 +111,7 @@ class PreProcess():
                               min_delay_seconds=1, max_retries=10)
 
         coordinates = []
+
         for delivery in delivery_list:
             add = delivery.address
             full_address = f"{add.address}, {add.house_number}, {add.city}, {add.district}, {add.zip_code}"  # nopep8
@@ -80,25 +122,45 @@ class PreProcess():
                     logger.info(coordinates)
 
                 else:
-                    print(f"A non-existent address was added: {full_address}")
+                    logger.info(f"A non-existent address was added: {full_address}")
                     return ""
             except Exception as e:
-                print(f"Error geocoding address {full_address}: {e}")
+                logger.error(f"Error geocoding address {full_address}: {e}")
                 return ""
-
         # logger.info(coordinates)
         return coordinates
 
     @staticmethod
     async def digest_csv(route_file) -> Tuple[List[Delivery], str, str]:
+        """
+        Parses a CSV file containing delivery data and returns a list of `Delivery` objects, along with
+        additional metadata such as date and trace ID.
+
+        This method:
+        1. Reads the CSV file containing delivery information.
+        2. Creates a list of `Delivery` objects from the parsed CSV content.
+        3. Extracts the date and trace ID from the file name.
+
+        Args:
+            route_file: The CSV file containing delivery data.
+
+        Returns:
+            Tuple[List[Delivery], str, str]: A tuple consisting of:
+                - A list of `Delivery` objects created from the CSV file.
+                - The date extracted from the file name.
+                - The trace ID extracted from the file name.
+        """
+
         delivery_list = []
         result = []
         file_name = route_file.filename
         date = file_name[0:10]
         trace_id = file_name[11:16]
+
         with route_file.file as f:
             csv_content = csv.DictReader(
                 io.TextIOWrapper(f, encoding='utf_8'), ('gsin', 'address', 'city', 'district', 'house_number', 'zip_code', 'telephone_number'))
+            
             for row in csv_content:
                 result.append(row)
 

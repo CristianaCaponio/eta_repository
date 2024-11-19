@@ -7,14 +7,26 @@ import json
 import pytz
 import os
 
-"""This application takes a TravelData object as input and iterates through its stop-arrivals to retrieve phone numbers and arrival times. If the arrival times 
-are less than one hour from the current time, a message is printed, and the message_sent attribute changes from false to true."""
-
-
 class MessageSending:
+    """
+    The `MessageSending` class contains methods to handle the sending of SMS messages related to the delivery status of packages.
+    It interacts with the SmsApiComClient to send notifications about estimated arrival times and delivery completions.
+
+    Key Responsibilities:
+    1. **Check Time and Send**: Checks if the arrival time of a stop is within one hour and triggers an SMS if necessary.
+    2. **Incoming Delivery Message**: Sends an SMS notification when a package is about to arrive.
+    3. **Delivery Occurred Message**: Sends an SMS notification when a package has been delivered.
+    """
 
     @staticmethod
     def check_time_and_send(travel_data: TravelData):
+        """
+        Checks if the arrival time of each stop is within one hour from the current time. If it is, 
+        it triggers the sending of an SMS message to notify the recipient.
+
+        Args:
+            travel_data (TravelData): The travel data object containing stop information.
+        """
         current_time = datetime.now(pytz.UTC)
         logger.info(f"The actual datetime is {current_time}")
 
@@ -29,6 +41,19 @@ class MessageSending:
 
     @staticmethod
     def incoming_delivery_message(stop: StopSummary) -> StopSummary:
+        """
+        Sends an SMS notification informing the recipient about the estimated delivery time.
+
+        This method formats the arrival time, retrieves the necessary SMS API token, and uses the SmsApiComClient 
+        to send a message to the recipient's phone number. If the message is successfully sent, the `message_sent` attribute 
+        is set to `True`.
+
+        Args:
+            stop (StopSummary): The stop data containing the recipient's phone number and estimated arrival time.
+
+        Returns:
+            StopSummary: The updated stop object with the `message_sent` status set to `True` if the message was sent.
+        """
         sms_token = os.getenv("SMS_DELIVERING")
         logger.info(f"il token dell'api degli sms è {sms_token}")
         client = SmsApiComClient(access_token=sms_token)
@@ -40,7 +65,6 @@ class MessageSending:
         try:
                 
             if not stop.message_sent and not stop.delivered:
-
                 logger.info(f"messaggio a: {stop.arrivalAddress.telephone_number}: il tuo pacco arriverà il giorno  {formatted_datetime}")  # nopep8
                 stop.message_sent = True
                 return stop
@@ -66,7 +90,18 @@ class MessageSending:
         
     @staticmethod
     def delivery_occurred_message(stop: StopSummary) -> StopSummary:
+        """
+        Sends an SMS notification informing the recipient that their package has been delivered.
 
+        Similar to the `incoming_delivery_message` method, this method sends an SMS to notify the recipient that the package 
+        has been successfully delivered. If successful, it logs the event and updates the `message_sent` status.
+
+        Args:
+            stop (StopSummary): The stop data containing the recipient's phone number and delivery confirmation.
+
+        Returns:
+            StopSummary: The updated stop object with the `message_sent` status.
+        """
         sms_token = os.getenv("SMS_DELIVERING")
         client = SmsApiComClient(access_token=sms_token)
 

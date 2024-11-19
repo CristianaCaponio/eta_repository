@@ -1,30 +1,49 @@
 from geopy import distance
 from model.travel_data import TravelData
 from model.response import Response, Delivery_ETA
-from model.delivery import Delivery
 from loguru import logger
 from datetime import datetime, timedelta
 from typing import Dict, List
 
 
 class PostProcess():
-    """in this class the coordinates and addresses of TravelData are matched with the new order given by TomTom. the ETAs are updated with the delays given by
-        every zip code and, together with every delay, the departure and arrival time are also updated """
+    """
+    The `PostProcess` class contains functionality to process travel data after the main processing step. 
+    It is responsible for associating addresses to the travel data, updating estimated times of arrival (ETAs), 
+    and preparing the final response with the necessary delivery information.
 
+    Key Responsibilities:
+    1. **Address Association**: Associate delivery addresses to their respective stops in the ordered travel data.
+    2. **Delay Handling**: Apply delays to the departure and arrival times based on zip codes.
+    3. **ETA Calculation**: Calculate and update the estimated time of arrival for each delivery stop.
+    4. **Response Creation**: Prepare a structured response containing all relevant delivery ETA details.
+    """
+    
     @staticmethod
     def associate_address(raw_travel_data: TravelData, ordered_travel_data: TravelData) -> TravelData:
-        """ this function associates the addresses from raw_travel_data to ordered_travel_data based on the geographical proximity of the stops.
-            It calculates the distance between each stop's coordinates (departure and arrival) in both raw and ordered travel data, and matches the closest ones. 
-            Then, it updates the addresses and gsin for the corresponding stops in ordered_travel_data and updates the summary with the first stop's departure address 
-            and the last stop's arrival address."""
+        """
+        This method associates the delivery addresses to the stops in the ordered travel data based on geographic proximity.
 
+        It compares the departure and arrival locations of each stop in `raw_travel_data` with the corresponding stops in `ordered_travel_data`, 
+        calculating the distance between them. The closest match is used to assign the correct address to each stop.
+
+        Args:
+            raw_travel_data (TravelData): The original unprocessed travel data.
+            ordered_travel_data (TravelData): The ordered travel data that needs to be updated with addresses.
+
+        Returns:
+            TravelData: The updated `ordered_travel_data` with the correct addresses associated to each stop.
+        """
+        
         for stop in raw_travel_data.stops:
             departure_latitude = stop.departureLatitude
             departure_longitude = stop.departureLongitude
             arrival_latitude = stop.arrivalLatitude
             arrival_longitude = stop.arrivalLongitude
+            
             dep_dist_list = []
             arr_dist_list = []
+
             for i in range(len(ordered_travel_data.stops)):
 
                 ordered_departure_latitude = ordered_travel_data.stops[i].departureLatitude
@@ -34,7 +53,6 @@ class PostProcess():
 
                 dep_dist = distance.distance((departure_latitude, departure_longitude), (
                     ordered_departure_latitude, ordered_departure_longitude)).m
-
                 # logger.info(f"departure distance:{dep_dist}")
                 dep_dist_list.append(dep_dist)
 
@@ -57,31 +75,40 @@ class PostProcess():
 
     @staticmethod
     def add_delay_to_time(time_obj: datetime, delay_in_seconds: int) -> datetime:
-        """This method takes a datetime object and a delay in seconds. It applies the delay using timedelta, and 
-        returns the updated time as an ISO 8601 string."""
+        """
+        Adds a delay to the provided time object by a specified number of seconds.
 
+        This method is useful for adjusting the estimated times of arrival (ETA) for each stop based on delays 
+        due to factors like traffic or processing times.
+
+        Args:
+            time_obj (datetime): The original time object (either departure or arrival time).
+            delay_in_seconds (int): The delay in seconds to be added to the time.
+
+        Returns:
+            datetime: The new time object with the delay applied.
+        """
         new_time_obj = time_obj + timedelta(seconds=delay_in_seconds)
 
         return new_time_obj
-
-    # @staticmethod
-    # def add_delay_to_time(time_str: str, delay_in_seconds: int) -> str:
-        """This method takes an ISO-format time string and a delay in seconds. It converts the time string to a datetime object,
-            applies the delay using timedelta, and returns the updated time as an ISO-format string."""
-
-        # time_format = "%Y-%m-%dT%H:%M:%S%z"
-        # time_obj = datetime.strptime(time_str, time_format)
-        # new_time_obj = time_obj + timedelta(seconds=delay_in_seconds)
-        # formatted_time_str = new_time_obj.strftime("%Y-%m-%dT%H:%M:%S%z")
-        # formatted_time_with_colon = formatted_time_str[:-2] + ":" + formatted_time_str[-2:]
-
-        # return formatted_time_with_colon
-        # return new_time_obj.strptime(time_format)
-
+   
     @staticmethod
     def update_eta(travel_data: TravelData, zip_code_delay: Dict[str, int], default_delay: int)  -> TravelData:
-        """this function updates ETAs with the delay given by every zip code"""
-        logger.info(f'il cap delay di default è  {default_delay}')
+        """
+        Updates the ETAs for each stop in the travel data, considering delays based on zip code.
+
+        The method checks the delay for each stop based on its zip code and adds it to both the departure and arrival times. 
+        If no specific delay is found for a zip code, a default delay is applied.
+
+        Args:
+            travel_data (TravelData): The travel data containing the stops with their respective times.
+            zip_code_delay (Dict[str, int]): A dictionary mapping zip codes to delay values (in seconds).
+            default_delay (int): The default delay (in seconds) to be applied if no zip code-specific delay is found.
+
+        Returns:
+            TravelData: The updated travel data with the new ETAs.
+        """
+        logger.info(f'the default cap delay is {default_delay}')
         if not travel_data.stops:
             logger.info(
                 "No stops available in travel_data. Skipping ETA update.")
@@ -100,54 +127,32 @@ class PostProcess():
                 travel_data.stops[y].arrivalTime = PostProcess.add_delay_to_time(
                     arr_time, delay)
         travel_data.summary.arrivalTime = travel_data.stops[-1].arrivalTime
+
         return travel_data
 
-    # @staticmethod
-    # def create_response(travel_data: TravelData) -> Response:
-
-    #     delivery = []
-    #     if travel_data.delivered_stops:
-    #         for delivered in travel_data.delivered_stops:
-    #             logger.info(delivered)
-    #             delivery_eta = Delivery_ETA(**{
-    #                 'gsin': delivered.gsin,
-    #                 'address': delivered.arrivalAddress,
-    #                 'eta': delivered.arrivalTime,
-    #                 'delivered': delivered.delivered,
-    #                 'deliverd_at': delivered.delivered_at
-    #             })
-    #             delivery.append(delivery_eta)
-
-    #     if travel_data.stops:
-    #         for stop in travel_data.stops:
-    #             delivery_eta = Delivery_ETA(**{
-    #                 'gsin': stop.gsin,
-    #                 'address': stop.arrivalAddress,
-    #                 'eta': stop.arrivalTime,
-    #                 'delivered': stop.delivered,
-    #                 'delivered_at': stop.delivered_at
-    #             })
-    #             delivery.append(delivery_eta)
-
-    #     response = Response(**{
-    #         'ginc': travel_data.ginc,
-    #         'personal_id': travel_data.personal_id,
-    #         'delivery': delivery
-    #     })
-    #     logger.info(response)
-    #     return response
+ 
     @staticmethod
     def process_stops(travel_data: TravelData) -> list[Delivery_ETA]:
-        
+        """
+        Processes the stops in the travel data to create a list of `Delivery_ETA` objects.
+
+        This method constructs a `Delivery_ETA` object for each stop, containing the delivery information 
+        (such as GSIN, address, ETA, and delivery status). The resulting list can be used for reporting or 
+        generating responses for external systems.
+
+        Args:
+            travel_data (TravelData): The travel data containing the stops to be processed.
+
+        Returns:
+            List[Delivery_ETA]: A list of `Delivery_ETA` objects representing the ETA details for each stop.
+        """
         result = []
-        # Combina fermate consegnate e non consegnate
         all_stops = []
         if travel_data.delivered_stops:
             all_stops.extend(travel_data.delivered_stops)
         if travel_data.stops:
             all_stops.extend(travel_data.stops)
 
-        # Processa ogni fermata
         for stop in all_stops:
             try:
                 delivery_eta = Delivery_ETA(**{
@@ -159,11 +164,24 @@ class PostProcess():
                 })
                 result.append(delivery_eta)
             except AttributeError as e:
-                logger.error(f"Errore durante la creazione di Delivery_ETA per {stop}: {e}")
-        return result
+                logger.error(f"Error during Delivery_ETA creation for {stop}: {e}")
+        return result    
     
     @staticmethod
     def create_response(travel_data: TravelData) -> Response:
+        """
+        Creates a structured `Response` object containing the travel data and delivery ETA information.
+
+        This method aggregates the processed delivery ETAs into a response format that can be sent to clients 
+        or used by other services. The response includes the travel summary, personal ID, GINC, and a list of 
+        `Delivery_ETA` objects.
+
+        Args:
+            travel_data (TravelData): The travel data containing delivery stop details.
+
+        Returns:
+            Response: A structured response object containing the travel and delivery ETA data.
+        """
         delivery = PostProcess.process_stops(travel_data)
 
         response = Response(**{
@@ -172,3 +190,4 @@ class PostProcess():
             'delivery': delivery
         })
         return response
+

@@ -8,30 +8,70 @@ import os
 
 
 class TomTom:
-    """in this class are stored all the functions related to TomTom and the population of TravelData with the ETAs and information provided by tomTom routing api"""
+    """
+    The TomTom class provides methods for interacting with the TomTom Routing API to calculate optimal routes
+    and estimate travel times. It retrieves route details, including distance, time, traffic conditions, and 
+    stop information, and processes this data into a structured `TravelData` object.
+
+    Key Responsibilities:
+    1. Generate API request strings to interact with TomTom's routing service.
+    2. Make requests to the TomTom API to obtain routing information in JSON format.
+    3. Parse the response from TomTom to extract useful information like route details, stop information, 
+       and estimated travel times.
+    4. Populate a `TravelData` object with the parsed route and stop details, which can then be used for 
+       further processing or display.
+    """
 
     @staticmethod
     def order_travel_data(coordinates: List[str]) -> TravelData:
-        """this function takes in input a list of strings (the coordinates in string format) and returns a TravelData object.
-        I   t recalls all the following functions to create the coordinates string with the format requested by TomTom url, to make the request to TomTom
-            and to parse the response in order to obtain a TravelData object populated with all TomTom informations and eta calculations"""
+        """
+        Generate a TravelData object enriched with route details and ETAs using TomTom's API.
+
+        Steps:
+        1. Create a request URL with the provided coordinates.
+        2. Send the request to TomTom's routing service and obtains in response a JSON.
+        3. Parse the JSON response to extract route details and stop information.
+        4. Populate a TravelData object with the calculated route data.
+
+        Args:
+            coordinates (List[str]): A list of coordinates (latitude, longitude) as strings.
+
+        Returns:
+            TravelData: The enriched TravelData object containing route and stop information.
+
+        Raises:
+            ValueError: If the TOMTOM_API_KEY environment variable is not set.
+            HTTPError: If the TomTom API request fails.
+        """
 
         tomtom_url = TomTom.create_request_string(coordinates)
         json_response = TomTom.tomtom_request(tomtom_url)
         ordered_travel_data = TomTom.parse_tomtom_response(
             json_response)
+        
         return ordered_travel_data
 
     @staticmethod
     def create_request_string(coordinate_list: List[str]) -> str:        
-        """This function takes all coordinates in string format and returns a string with the structure needed for TomTom url. An Example of this string
-            is 43.12345,16.12345:43.678910:16.678910."""
+        
+        """
+        Construct a TomTom API request string from a list of coordinates.
+
+        Steps:
+        1. Format the coordinates into a string structure acceptable by TomTom's API.
+        2. Append additional query parameters required for the request.
+
+        Args:
+            coordinate_list (List[str]): A list of coordinates (latitude, longitude) as strings.
+
+        Returns:
+            str: A formatted request string to be used in the TomTom API URL.
+        """
 
         coordinate_str = ""
+
         for coordinate in coordinate_list:
             coordinate_str = coordinate_str + ":" + coordinate[0] + ","+coordinate[1]  # nopep8
-
-        # logger.info(coordinate_str)
 
         return (
             coordinate_str[1:]
@@ -45,10 +85,28 @@ class TomTom:
 
     @staticmethod
     def tomtom_request(request_params: str) -> TravelData:
-        """this function is used to make the request to TomTom and returns a json with the TomTom format"""
+        """
+        Make a request to the TomTom API and return the JSON response.
+
+        Steps:
+        1. Construct the full request URL using the provided parameters.
+        2. Send the request to TomTom's API.
+        3. Obtains the response which is in JSON format.
+
+        Args:
+            request_params (str): The query string parameters for the TomTom request.
+
+        Returns:
+            dict: The JSON response from the TomTom API containing routing information.
+
+        Raises:
+            ValueError: If the TOMTOM_API_KEY environment variable is not set.
+            HTTPError: If the TomTom API request fails.
+        """
 
         baseUrl = "https://api.tomtom.com/routing/1/calculateRoute/"
         API_KEY = os.getenv("TOMTOM_API_KEY")
+
         if not API_KEY:
             raise ValueError("TOMTOM_API_KEY environment variable is not set.")
 
@@ -67,16 +125,26 @@ class TomTom:
 
     @staticmethod
     def parse_tomtom_response(json_response: dict) -> TravelData:
-        """This function parses the reponse provided by TomTom and populates with its data the TravelData object"""
-        
+        """
+        Parse the response from TomTom and populate a TravelData object.
+
+        Steps:
+        1. Extract relevant information from the JSON response (e.g., route summary, stop details).
+        2. Create TravelData objects populated with the parsed data.
+
+        Args:
+            json_response (dict): The JSON response from TomTom's API containing routing information.
+
+        Returns:
+            TravelData: A TravelData object populated with parsed information, including summary and stops.
+        """
+
         tomtom_start_latitude = json_response["routes"][0]["legs"][0]["points"][0]["latitude"]
         tomtom_start_longitude = json_response["routes"][0]["legs"][0]["points"][0]["longitude"]
         tomtom_end_latitude = json_response['routes'][0]['legs'][-1]['points'][-1]["latitude"]
         tomtom_end_longitude = json_response['routes'][0]['legs'][-1]['points'][-1]["longitude"]
-
         start_time_iso = datetime.fromisoformat(json_response["routes"][0]["summary"]["departureTime"])
         end_time_iso = datetime.fromisoformat(json_response["routes"][0]["summary"]["arrivalTime"])
-
        
         route_summary = Summary(
            
@@ -98,13 +166,12 @@ class TomTom:
         )
      
         stops = []
+
         for leg_data in json_response["routes"][0]["legs"]:
             tomtom_departure_latitude = leg_data["points"][0]["latitude"]
             tomtom_departure_longitude = leg_data["points"][0]["longitude"]
             tomtom_arrival_latitude = leg_data['points'][-1]["latitude"]
-            tomtom_arrival_longitude = leg_data['points'][-1]["longitude"]
-
-             
+            tomtom_arrival_longitude = leg_data['points'][-1]["longitude"]             
             departure_time_iso = datetime.fromisoformat(leg_data["summary"]["departureTime"])
             arrival_time_iso = datetime.fromisoformat(leg_data["summary"]["arrivalTime"])
 
@@ -136,5 +203,5 @@ class TomTom:
             delivered_stops = []                               
 
         )
-        logger.info(tomtom_travel_data)
+        #logger.info(tomtom_travel_data)
         return tomtom_travel_data
