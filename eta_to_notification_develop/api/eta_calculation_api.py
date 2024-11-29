@@ -61,7 +61,8 @@ async def create_upload_file(file: UploadFile,
         complete_travel_data, cap_delays, default_delay = int(os.getenv('DEFAULT_DELAY',100)))    
     delay_travel_data.ginc = trace_id
     # logger.info(delay_travel_data)
-    message_sending = MessageSending.check_time_and_send(delay_travel_data)
+    first_message_sending = MessageSending.first_delivery_message(delay_travel_data)
+    second_message_sending = MessageSending.check_time_and_send(delay_travel_data)
     save_response = await FollowTrackDB.add_new_object(route_db, delay_travel_data)
 
     if save_response:

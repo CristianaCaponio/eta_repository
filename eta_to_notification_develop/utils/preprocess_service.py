@@ -170,16 +170,16 @@ class PreProcess():
 
         for item in result:
             logger.info(item)
-            gsin = item['gsin']
-            del item['gsin']
+            gsin = item['id']
+            del item['id']
 
             address = Address(**{
-                'address': item['address'],
-                'city': item['city'],
-                'district': item['district'],
-                'house_number': item['house_number'],
-                'zip_code': item['zip_code'],
-                'telephone_number': item['telephone_number']
+                'address': item['indirizzo'],
+                'city': item['città'],
+                'district': item['provincia'],
+                'house_number': item['numero civico'],
+                'zip_code': item['cap'],
+                'telephone_number': item['telefono']
             })
 
             item = Delivery(**{

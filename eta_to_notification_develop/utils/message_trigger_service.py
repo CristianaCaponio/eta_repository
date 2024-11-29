@@ -35,12 +35,12 @@ class MessageSending:
             if stop.message_sent is False:
                 arrival_time = stop.arrivalTime
 
-                if arrival_time < current_time + timedelta(hours=1):
-                    MessageSending.incoming_delivery_message(stop)
+                if arrival_time < current_time + timedelta(minutes=30):
+                    MessageSending.second_delivery_message(stop)
                     
 
     @staticmethod
-    def incoming_delivery_message(stop: StopSummary) -> StopSummary:
+    def second_delivery_message(stop: StopSummary) -> StopSummary:
         """
         Sends an SMS notification informing the recipient about the estimated delivery time.
 
@@ -65,7 +65,7 @@ class MessageSending:
         try:
                 
             if not stop.message_sent and not stop.delivered:
-                logger.info(f"messaggio a: {stop.arrivalAddress.telephone_number}: il tuo pacco arriverà il giorno  {formatted_datetime}")  # nopep8
+                logger.info(f"messaggio a: {stop.arrivalAddress.telephone_number}: la consegna è prevista nel seguente arco temporale:  {formatted_datetime} e {(stop.arrivalTime + timedelta(hours=1)).strftime('%d/%m/%Y %H:%M:%S')}")  # nopep8
                 stop.message_sent = True
                 return stop
                 # response = client.sms.send(to = stop.arrivalAddress.telephone_number, message = f"il tuo pacco arriverà alle ore {formatted_datetime}",from_ = "Follow-Track")
@@ -129,3 +129,54 @@ class MessageSending:
             stop.message_report = f"An exception during the sms deliver to  {stop.arrivalAddress.telephone_number} was found: {e}"
             stop.message_sent = False
             return stop
+        
+    @staticmethod
+    def first_delivery_message(travel_data: TravelData) -> TravelData:
+        """
+        Sends an SMS notification informing the recipient about the estimated delivery time.
+
+        This method formats the arrival time, retrieves the necessary SMS API token, and uses the SmsApiComClient 
+        to send a message to the recipient's phone number. If the message is successfully sent, the `message_sent` attribute 
+        is set to `True`.
+
+        Args:
+            stop (StopSummary): The stop data containing the recipient's phone number and estimated arrival time.
+
+        Returns:
+            StopSummary: The updated stop object with the `message_sent` status set to `True` if the message was sent.
+        """
+        sms_token = os.getenv("SMS_DELIVERING")
+        logger.info(f"il token dell'api degli sms è {sms_token}")
+        client = SmsApiComClient(access_token=sms_token)
+
+        with open('./eta_to_notification_develop/sms_deliver_errors.json') as deliver_errors:
+            error_codes = json.load(deliver_errors)
+
+        for single_stop in travel_data.stops:
+
+            try:
+
+                single_delivery = single_stop.arrivalAddress
+                formatted_datetime = single_stop.arrivalTime.strftime("%d/%m/%Y %H:%M:%S")   
+                
+                logger.info(f"messaggio a: {single_delivery.telephone_number}: la consegna è prevista per il giorno  {formatted_datetime}. Un nuovo messaggio sarà inviato quando saremo in prossimità del tuo indirizzo")  # nopep8
+                    
+                    # response = client.sms.send(to = stop.arrivalAddress.telephone_number, message = f"la consegna è prevista per il giorno  {formatted_datetime}. Un nuovo messaggio sarà inviato quando saremo in prossimità del tuo indirizzo",from_ = "Follow-Track")
+
+                    # if response.status_code in error_codes.values():
+                    #     for message, code in error_codes.items():
+                    #             if code == response.status_code:
+                    #                 stop.message_report = f"Problema nell'invio del messaggio di arrivo a:  {stop.arrivalAddress.telephone_number}: {message} "
+                    #                 stop.message_sent = False
+                    #                 return stop
+
+                    #             else:
+                    #                 stop.message_report = f"messaggio di arrivo inviato a: {stop.arrivalAddress.telephone_number}"
+                    #                 stop.message_sent = True
+                    #                 return stop                         
+            
+
+            except SendException as e:
+                single_stop.message_report = f"An exception during the sms deliver to  {stop.arrivalAddress.telephone_number} was found: {e}"
+        
+        return travel_data
