@@ -14,6 +14,7 @@ from loguru import logger
 import json
 import os
 from motor.motor_asyncio import AsyncIOMotorDatabase
+from fastapi.responses import StreamingResponse
 from controller.db.db_setting import ROUTE_DBDependency
 
 eta_api_router = APIRouter(tags=["Eta-To-Notification"])
@@ -22,7 +23,7 @@ app = FastAPI()
 
 @eta_api_router.post("/upload_route_file/")
 async def create_upload_file(file: UploadFile,
-                             route_db: AsyncIOMotorDatabase = ROUTE_DBDependency) -> Response:
+                             route_db: AsyncIOMotorDatabase = ROUTE_DBDependency) -> StreamingResponse:
     """
     Upload a CSV file containing route details, process the data, and store the route in the database.
 
@@ -67,7 +68,13 @@ async def create_upload_file(file: UploadFile,
 
     if save_response:
         logger.info("trace saved in db")
-        response = PostProcess.create_response(delay_travel_data)
+        system_response = PostProcess.create_response(delay_travel_data)
+        csv_file = PostProcess.generate_csv(system_response)
+        response = StreamingResponse(
+        csv_file,
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=route.csv"}
+    )
         return response
     else:
         logger.info("error in store trace inside db")

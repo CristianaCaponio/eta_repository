@@ -4,6 +4,8 @@ from model.response import Response, Delivery_ETA
 from loguru import logger
 from datetime import datetime, timedelta
 from typing import Dict, List
+from io import StringIO
+import csv
 
 
 class PostProcess():
@@ -152,7 +154,7 @@ class PostProcess():
             all_stops.extend(travel_data.delivered_stops)
         if travel_data.stops:
             all_stops.extend(travel_data.stops)
-
+        
         for stop in all_stops:
             try:
                 delivery_eta = Delivery_ETA(**{
@@ -191,3 +193,36 @@ class PostProcess():
         })
         return response
 
+    @staticmethod
+    def generate_csv(response: Response) -> StringIO:
+        """
+        Generates a CSV file containing delivery information.
+
+        Args:
+            deliveries: List of Delivery_ETA objects containing delivery details.
+            
+        Returns:
+            StringIO: In-memory CSV file containing delivery details.
+        """
+        csv_file = StringIO()
+        csv_writer = csv.writer(csv_file)
+        
+        csv_writer.writerow([
+            "id", "indirizzo", "città", "provincia", "numero civico", "cap", "numero civico", "ETA"
+        ])
+
+        deliveries = response.delivery
+        for delivery in deliveries:
+            csv_writer.writerow([
+                delivery.gsin,
+                delivery.address.address,
+                delivery.address.city,
+                delivery.address.district,
+                delivery.address.house_number,
+                delivery.address.zip_code,
+                delivery.address.telephone_number,
+                delivery.eta.isoformat(),
+            ])
+        
+        csv_file.seek(0)  
+        return csv_file
