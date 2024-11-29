@@ -9,6 +9,7 @@ from loguru import logger
 import csv
 import io
 
+
 class PreProcess():
     """
     The `PreProcess` class provides functionality to prepare and preprocess delivery data, including:
@@ -83,7 +84,7 @@ class PreProcess():
             stops=new_stops,
             delivered_stops=[]
         )
-        #logger.info(f"travel data in preprocess_service: {travel_data}")
+        # logger.info(f"travel data in preprocess_service: {travel_data}")
         return coordinates, travel_data
 
     @staticmethod
@@ -122,7 +123,8 @@ class PreProcess():
                     logger.info(coordinates)
 
                 else:
-                    logger.info(f"A non-existent address was added: {full_address}")
+                    logger.info(
+                        f"A non-existent address was added: {full_address}")
                     return ""
             except Exception as e:
                 logger.error(f"Error geocoding address {full_address}: {e}")
@@ -159,8 +161,8 @@ class PreProcess():
 
         with route_file.file as f:
             csv_content = csv.DictReader(
-                io.TextIOWrapper(f, encoding='utf_8'), ('gsin', 'address', 'city', 'district', 'house_number', 'zip_code', 'telephone_number'))
-            
+                io.TextIOWrapper(f, encoding='utf_8'), ('id', 'indirizzo', 'città', 'provincia', 'numero civico', 'cap', 'telefono'))
+
             for row in csv_content:
                 result.append(row)
 

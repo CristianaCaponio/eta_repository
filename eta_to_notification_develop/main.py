@@ -6,7 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from loguru import logger
 from controller.db.db_setting import ROUTE_DBSettings
-
+import multiprocessing
+from socket_service import SocketService
 from api.eta_calculation_api import eta_api_router
 from settings import Settings
 import motor.motor_asyncio
@@ -55,6 +56,10 @@ app.add_middleware(
 #     'input.topic': os.environ.get('INPUT_TOPIC_NAME', 'eta_calculation')
 # }
 
+def socket_thread():
+    ngs_socket = SocketService()
+    ngs_socket.run_forever()
+
 
 @app.on_event("startup")
 async def startup_event() -> None:
@@ -75,6 +80,15 @@ async def startup_event() -> None:
                                                     tz_aware=True)  # connect now adn detect connection issues
 
     route_db = client.get_default_database()
+
+    # --------------- SOCKET -----------------------------------------------------------
+
+    app.state.all_processes = []
+    process = multiprocessing.Process(target=socket_thread, args=())
+    process.start()
+    app.state.all_processes.append(process)
+
+    # ----------------------------------------------------------------------------------
 
     # app.state.kafka_controller = KafkaController(
     #     {"bootstrap.servers": os.environ.get('BOOTSTRAP_SERVERS', 'localhost:9092')})
@@ -100,6 +114,9 @@ async def shutdown_event() -> None:
     """
     logger.info("Shuting down. Waiting for consumer to stop...")
     app.state.consumer.close()
+    logger.info("close socket processes....")
+    for process in app.state.all_processes:
+        process.terminate()
 
     logger.info("Done. Bye")
 
