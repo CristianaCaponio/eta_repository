@@ -47,6 +47,24 @@ class FollowTrackDB(object):
             return None
 
     @staticmethod
+    async def get_route_object_by_date(db: AsyncIOMotorDatabase, date: str) -> List[TravelData]:
+        """
+        get Travel Data object based on GINC
+        """
+        try:
+            result = [TravelData.parse_mongo(match) async for match in retreive_entry_by_query(db,
+                                                                                               COLLECTION_NAME,
+                                                                                               {'personal_id': date},
+                                                                                               1
+                                                                                               )]
+
+            # logger.info(result)
+            return result
+        except Exception as ex:
+            logger.error(f'follow_track_db.get_route_object, error:{ex}')
+            return None
+
+    @staticmethod
     async def delete_route_object(db: AsyncIOMotorDatabase, ginc: str) -> bool:
         '''
         delete 

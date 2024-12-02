@@ -26,17 +26,24 @@ app = FastAPI()
 async def create_upload_file(file: UploadFile,
                              route_db: AsyncIOMotorDatabase = ROUTE_DBDependency) -> StreamingResponse:
     """
-    Upload a CSV file containing route details, process the data, and store the route in the database.
+    Handles the upload of a CSV file containing route details, processes the data,
+    and stores the resulting delivery route in the database.
 
     Steps:
-    1. Extract delivery details from the uploaded CSV.
-    2. Make an initial call to TomTom to calculate the optimal delivery sequence.
-    3. Associate addresses to deliveries and adjust ETA based on ZIP code delays.
-    4. Send SMS notifications to consignees.
-    5. Save the processed route in the database.
+    1. **Extract delivery details**: Reads the uploaded CSV file and extracts relevant delivery information.
+    2. **Optimal route calculation**: Sends the extracted data to TomTom to calculate the optimal delivery sequence.
+    3. **Address association and ETA adjustment**: Links addresses to deliveries and updates the estimated times of arrival (ETAs),
+       accounting for potential ZIP code-specific delays.
+    4. **Send notifications**: Sends initial SMS notifications to recipients based on the processed delivery schedule.
+    5. **Save the route**: Stores the processed route and its details in the database for further use.
+
+    Returns:
+        StreamingResponse: A CSV file containing the processed delivery route and its details.
 
     Raises:
-        HTTPException: If the route already exists in the database (409) or if an error occurs during saving (500).
+        HTTPException:
+            - 409 Conflict: If a route with the same unique identifier (trace ID) already exists in the database.
+            - 500 Internal Server Error: If there is an error saving the route in the database.
     """
 
     delivery_list, date, trace_id = await PreProcess.digest_csv(file)
@@ -63,16 +70,14 @@ async def create_upload_file(file: UploadFile,
         complete_travel_data, cap_delays, default_delay=int(os.getenv('DEFAULT_DELAY', 100)))
     delay_travel_data.ginc = trace_id
     # logger.info(delay_travel_data)
-    first_message_sending = MessageSending.first_delivery_message(
-        delay_travel_data)
-    second_message_sending = MessageSending.check_time_and_send(
-        delay_travel_data)
+    MessageSending.first_delivery_message(delay_travel_data)
+    MessageSending.check_time_and_send(delay_travel_data)
     save_response = await FollowTrackDB.add_new_object(route_db, delay_travel_data)
 
     if save_response:
         logger.info("trace saved in db")
-        system_response = PostProcess.create_response(delay_travel_data)
-        csv_file = PostProcess.generate_csv(system_response)
+        # system_response = PostProcess.create_response(delay_travel_data)
+        csv_file = PostProcess.generate_csv(delay_travel_data)
         response = StreamingResponse(
             csv_file,
             media_type="text/csv",

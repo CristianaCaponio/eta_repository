@@ -20,7 +20,7 @@ class PostProcess():
     3. **ETA Calculation**: Calculate and update the estimated time of arrival for each delivery stop.
     4. **Response Creation**: Prepare a structured response containing all relevant delivery ETA details.
     """
-    
+
     @staticmethod
     def associate_address(raw_travel_data: TravelData, ordered_travel_data: TravelData) -> TravelData:
         """
@@ -36,13 +36,13 @@ class PostProcess():
         Returns:
             TravelData: The updated `ordered_travel_data` with the correct addresses associated to each stop.
         """
-        
+
         for stop in raw_travel_data.stops:
             departure_latitude = stop.departureLatitude
             departure_longitude = stop.departureLongitude
             arrival_latitude = stop.arrivalLatitude
             arrival_longitude = stop.arrivalLongitude
-            
+
             dep_dist_list = []
             arr_dist_list = []
 
@@ -93,9 +93,9 @@ class PostProcess():
         new_time_obj = time_obj + timedelta(seconds=delay_in_seconds)
 
         return new_time_obj
-   
+
     @staticmethod
-    def update_eta(travel_data: TravelData, zip_code_delay: Dict[str, int], default_delay: int)  -> TravelData:
+    def update_eta(travel_data: TravelData, zip_code_delay: Dict[str, int], default_delay: int) -> TravelData:
         """
         Updates the ETAs for each stop in the travel data, considering delays based on zip code.
 
@@ -118,8 +118,8 @@ class PostProcess():
 
         for i in range(len(travel_data.stops)-1):
             zip_code = travel_data.stops[i+1].departureAddress.zip_code
-            #delay = zip_code_delay[f"{zip_code}"]
-            delay = zip_code_delay.get(zip_code,default_delay)
+            # delay = zip_code_delay[f"{zip_code}"]
+            delay = zip_code_delay.get(zip_code, default_delay)
 
             for y in range(i+1, len(travel_data.stops)):
                 dep_time = travel_data.stops[y].departureTime
@@ -132,7 +132,6 @@ class PostProcess():
 
         return travel_data
 
- 
     @staticmethod
     def process_stops(travel_data: TravelData) -> list[Delivery_ETA]:
         """
@@ -154,7 +153,7 @@ class PostProcess():
             all_stops.extend(travel_data.delivered_stops)
         if travel_data.stops:
             all_stops.extend(travel_data.stops)
-        
+
         for stop in all_stops:
             try:
                 delivery_eta = Delivery_ETA(**{
@@ -166,9 +165,10 @@ class PostProcess():
                 })
                 result.append(delivery_eta)
             except AttributeError as e:
-                logger.error(f"Error during Delivery_ETA creation for {stop}: {e}")
-        return result    
-    
+                logger.error(
+                    f"Error during Delivery_ETA creation for {stop}: {e}")
+        return result
+
     @staticmethod
     def create_response(travel_data: TravelData) -> Response:
         """
@@ -194,35 +194,53 @@ class PostProcess():
         return response
 
     @staticmethod
-    def generate_csv(response: Response) -> StringIO:
+    def generate_csv(travel_data: TravelData) -> StringIO:
         """
         Generates a CSV file containing delivery information.
 
         Args:
-            deliveries: List of Delivery_ETA objects containing delivery details.
-            
+            travel_data (TravelData): A TravelData object containing delivery details.
+
         Returns:
             StringIO: In-memory CSV file containing delivery details.
         """
         csv_file = StringIO()
         csv_writer = csv.writer(csv_file)
-        
+
         csv_writer.writerow([
-            "id", "indirizzo", "città", "provincia", "numero civico", "cap", "numero civico", "ETA"
+            "id", "indirizzo", "città", "provincia", "numero civico", "cap", "telefono", "orario"
         ])
 
-        deliveries = response.delivery
-        for delivery in deliveries:
+        if travel_data.stops:
+            first_stop = travel_data.stops[0]
+            departure_address = first_stop.departureAddress
+            departure_time = first_stop.departureTime
+            departure_gsin = first_stop.gsin
+
             csv_writer.writerow([
-                delivery.gsin,
-                delivery.address.address,
-                delivery.address.city,
-                delivery.address.district,
-                delivery.address.house_number,
-                delivery.address.zip_code,
-                delivery.address.telephone_number,
-                delivery.eta.isoformat(),
+                departure_gsin,
+                departure_address.address,
+                departure_address.city,
+                departure_address.district,
+                departure_address.house_number,
+                departure_address.zip_code,
+                departure_address.telephone_number,
+                departure_time.isoformat(),
             ])
-        
-        csv_file.seek(0)  
+
+            for single_delivery in travel_data.stops:
+
+                arrival_address = single_delivery.arrivalAddress
+                csv_writer.writerow([
+                    single_delivery.gsin,
+                    arrival_address.address,
+                    arrival_address.city,
+                    arrival_address.district,
+                    arrival_address.house_number,
+                    arrival_address.zip_code,
+                    arrival_address.telephone_number,
+                    single_delivery.arrivalTime.isoformat(),
+                ])
+
+        csv_file.seek(0)
         return csv_file
