@@ -157,7 +157,7 @@ class PreProcess():
         result = []
         file_name = route_file.filename
         date = file_name[0:10]
-        trace_id = file_name[11:16]
+        trace_id = file_name[11:-4]
 
         with route_file.file as f:
             csv_content = csv.DictReader(

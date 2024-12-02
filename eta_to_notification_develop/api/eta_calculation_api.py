@@ -21,6 +21,7 @@ eta_api_router = APIRouter(tags=["Eta-To-Notification"])
 
 app = FastAPI()
 
+
 @eta_api_router.post("/upload_route_file/")
 async def create_upload_file(file: UploadFile,
                              route_db: AsyncIOMotorDatabase = ROUTE_DBDependency) -> StreamingResponse:
@@ -43,7 +44,7 @@ async def create_upload_file(file: UploadFile,
 
     route = await FollowTrackDB.get_route_object(route_db, trace_id)
     # logger.info(f'il route è {route}')
-   
+
     if route or route is None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail=f"route with the same ginc is alredy registered in db.")
@@ -53,17 +54,19 @@ async def create_upload_file(file: UploadFile,
         coordinates)
     complete_travel_data = PostProcess.associate_address(
         raw_travel_data, ordered_travel_data)
-    
+
     with open("./eta_to_notification_develop/zip_code.json") as cap_file:
         cap_delays = json.load(cap_file)
         # logger.info(cap_delays)
 
     delay_travel_data = PostProcess.update_eta(
-        complete_travel_data, cap_delays, default_delay = int(os.getenv('DEFAULT_DELAY',100)))    
+        complete_travel_data, cap_delays, default_delay=int(os.getenv('DEFAULT_DELAY', 100)))
     delay_travel_data.ginc = trace_id
     # logger.info(delay_travel_data)
-    first_message_sending = MessageSending.first_delivery_message(delay_travel_data)
-    second_message_sending = MessageSending.check_time_and_send(delay_travel_data)
+    first_message_sending = MessageSending.first_delivery_message(
+        delay_travel_data)
+    second_message_sending = MessageSending.check_time_and_send(
+        delay_travel_data)
     save_response = await FollowTrackDB.add_new_object(route_db, delay_travel_data)
 
     if save_response:
@@ -71,10 +74,10 @@ async def create_upload_file(file: UploadFile,
         system_response = PostProcess.create_response(delay_travel_data)
         csv_file = PostProcess.generate_csv(system_response)
         response = StreamingResponse(
-        csv_file,
-        media_type="text/csv",
-        headers={"Content-Disposition": f"attachment; filename=route.csv"}
-    )
+            csv_file,
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename=route.csv"}
+        )
         return response
     else:
         logger.info("error in store trace inside db")
@@ -90,7 +93,7 @@ async def get_route_object_by_ginc(ginc: str,
 
     Args:
         ginc (str): The unique identifier for the route.
-       
+
     Returns:
         TravelData: The route information if found.
 
@@ -106,9 +109,10 @@ async def get_route_object_by_ginc(ginc: str,
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"route information not found.")
 
+
 @eta_api_router.post("/route_delete/", status_code=status.HTTP_200_OK)
 async def delete_trace(ginc: str,
-                       route_db: AsyncIOMotorDatabase = ROUTE_DBDependency):                        
+                       route_db: AsyncIOMotorDatabase = ROUTE_DBDependency):
     """
     Delete a route from the database using its unique identifier (ginc).
 
@@ -135,7 +139,7 @@ async def delete_trace(ginc: str,
 
 @eta_api_router.post("/route_update/", status_code=status.HTTP_201_CREATED)
 async def route_update(update: DeliveryMessage,
-                           route_db: AsyncIOMotorDatabase = ROUTE_DBDependency) -> Response:
+                       route_db: AsyncIOMotorDatabase = ROUTE_DBDependency) -> Response:
     """
     Update the delivery status of a specific order and recalculate route details.
 
@@ -149,7 +153,7 @@ async def route_update(update: DeliveryMessage,
 
     Args:
         update (DeliveryMessage): The delivery update information (ginc, gsin and delivery_time).
-    
+
     Returns:
         Response: The updated route response.
 
@@ -165,19 +169,20 @@ async def route_update(update: DeliveryMessage,
                             detail=f"route information not found.")
 
     new_travel_data = TomTomRecalculation.update_route(old_travel_data, update)
-    #logger.info(f"inside eta_calculation_api and travel data after update_route are are{new_travel_data}")
+    # logger.info(f"inside eta_calculation_api and travel data after update_route are are{new_travel_data}")
     ordered_travel_data = TomTomRecalculation.order_travel_data(
-        new_travel_data)    
-    #logger.info(f"inside eta_calculation_api and travel data after order_travel_data are {new_travel_data}")
+        new_travel_data)
+    # logger.info(f"inside eta_calculation_api and travel data after order_travel_data are {new_travel_data}")
     with open("./eta_to_notification_develop/zip_code.json") as cap_file:
         cap_delays = json.load(cap_file)
         logger.info(cap_delays)
 
-    delay_travel_data = PostProcess.update_eta(ordered_travel_data, cap_delays, default_delay = int(os.getenv('DEFAULT_DELAY',100)))
-    #logger.info(f"travel_data delays after il Postprocess.update_eta are {delay_travel_data}")
+    delay_travel_data = PostProcess.update_eta(
+        ordered_travel_data, cap_delays, default_delay=int(os.getenv('DEFAULT_DELAY', 100)))
+    # logger.info(f"travel_data delays after il Postprocess.update_eta are {delay_travel_data}")
 
     message_sending = MessageSending.check_time_and_send(delay_travel_data)
-    
+
     ###########
     save_response = await FollowTrackDB.update_route_object(route_db, delay_travel_data)
     if save_response:
@@ -192,7 +197,7 @@ async def route_update(update: DeliveryMessage,
 
 # @eta_api_router.post("/route_calculation", status_code=status.HTTP_201_CREATED)
 # async def eta_calculation(delivery_list: List[Delivery]) -> TravelData:
-#     """this is the api used for ETA calculation. It takes in input a list of addresses with a gsin and return a TravelData object with TomTom information and time delays 
+#     """this is the api used for ETA calculation. It takes in input a list of addresses with a gsin and return a TravelData object with TomTom information and time delays
 #     provided by every zip code"""
 
 #     coordinates, raw_travel_data = PreProcess.populate_travel_data(

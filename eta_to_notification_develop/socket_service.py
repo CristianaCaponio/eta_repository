@@ -4,6 +4,7 @@ import socket
 import threading
 
 from loguru import logger
+from parser import parse
 
 
 class SocketService():
@@ -33,7 +34,9 @@ class SocketService():
                 break
             logger.debug(f'Raw Bytes: {binascii.hexlify(data)}')
             logger.debug(f'Current Thread: {cur_thread.name}')
-            # parsed_message = parse(data, address)
+            parsed_message = parse(data, address)
+            logger.info(f"parsed message: {parsed_message}")
+
             # if 'MAC' in parsed_message.keys():
             #     # teltonika = Teltonika(parsed_message)
             #     send_raw_to_trackone(parsed_message)

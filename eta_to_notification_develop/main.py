@@ -68,7 +68,7 @@ async def startup_event() -> None:
     the request via request.app.state
     """
 
-    logger.info("Secure storage service ready.")
+    logger.info("Follow Track service ready.")
 
     """
     Register events to initialize/destroy global state (accessible in all
@@ -104,7 +104,7 @@ async def startup_event() -> None:
     #                                  producer=app.state.producer)
 
     app.state.route_db = route_db
-    logger.info("RT service ready.")
+    logger.info("Follow Track service ready.")
 
 
 @app.on_event("shutdown")
