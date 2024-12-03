@@ -9,8 +9,10 @@ from utils.message_trigger_service import MessageSending
 from model.travel_data import TravelData
 from model.response import Response
 from model.device_message import DeliveryMessage
+from model.tracker import TrackerMessage
 from controller.db.follow_track_db import FollowTrackDB
 from loguru import logger
+from geopy import distance
 import json
 import os
 from motor.motor_asyncio import AsyncIOMotorDatabase

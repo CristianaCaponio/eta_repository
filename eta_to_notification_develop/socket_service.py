@@ -4,7 +4,7 @@ import socket
 import threading
 
 from model.tracker import TrackerMessage
-from utils.tracker_update import TrackerUpdate
+from utils.send_request import from_object_to_json, send_message
 from loguru import logger
 from parser import parse
 import datetime
@@ -42,14 +42,15 @@ class SocketService():
             if 'AVL_data' in parsed_message:
                 # logger.info(parsed_message['AVL_data'])
                 for data in parsed_message['AVL_data']:
-                    tracker_update = TrackerMessage(**{
+                    update = TrackerMessage(**{
                         "lat": data['GPS_element']['latitude'],
                         "long": data['GPS_element']['longitude'],
                         "time": datetime.datetime.fromtimestamp(data['timestamp']/1000).strftime('%Y-%m-%dT%H:%M:%SZ')
                     })
-                    logger.info(tracker_update)
-                    update = TrackerUpdate.is_arrived(tracker_update)
                     logger.info(update)
+                    update_json = from_object_to_json(update)
+                    response = send_message(update_json)
+                    logger.info(response)
 
     def run_forever(self):
         while True:

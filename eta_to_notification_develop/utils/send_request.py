@@ -1,11 +1,8 @@
-from model.travel_data import TravelData
+
 from model.tracker import TrackerMessage
-from geopy import distance
 from loguru import logger
 import json
 import os
-from controller.db.follow_track_db import FollowTrackDB
-from controller.db.db_setting import ROUTE_DBDependency
 from typing import Dict
 import requests
 from requests.models import Response
@@ -29,7 +26,7 @@ def from_object_to_json(informations: TrackerMessage):
 
 def send_message(message: Dict) -> Response:
     """
-    Function to send a teltonika message.
+    Function to send a message.
     """
     try:
         logger.debug("Sending POST request.")
