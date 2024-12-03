@@ -5,4 +5,4 @@ from datetime import datetime
 class TrackerMessage(BaseModel):
     lat: float
     long: float
-    time: datetime
+    time: str

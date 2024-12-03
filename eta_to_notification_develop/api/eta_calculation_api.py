@@ -16,6 +16,7 @@ import os
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from fastapi.responses import StreamingResponse
 from controller.db.db_setting import ROUTE_DBDependency
+import datetime
 
 eta_api_router = APIRouter(tags=["Eta-To-Notification"])
 
@@ -200,31 +201,56 @@ async def route_update(update: DeliveryMessage,
                             detail=f"error in store trace inside db")
 
 
-# @eta_api_router.post("/route_calculation", status_code=status.HTTP_201_CREATED)
-# async def eta_calculation(delivery_list: List[Delivery]) -> TravelData:
-#     """this is the api used for ETA calculation. It takes in input a list of addresses with a gsin and return a TravelData object with TomTom information and time delays
-#     provided by every zip code"""
+@eta_api_router.post("/tracker_update/", status_code=status.HTTP_200_OK)
+async def route_update(update: TrackerMessage,
+                       route_db: AsyncIOMotorDatabase = ROUTE_DBDependency):
 
-#     coordinates, raw_travel_data = PreProcess.populate_travel_data(
-#         delivery_list)
+    date = datetime.datetime.now().strftime("%Y_%m_%d")
+    trace_list = await FollowTrackDB.get_route_object_by_date(route_db, date)
+    trace = trace_list[0]
+    # logger.info(trace)
+    tracker_coordinates = (update.lat, update.long)
 
-#     ordered_travel_data = TomTom.order_travel_data(
-#         coordinates)
+    for stop in trace.stops:
+        if not stop.delivered:
+            stop_coordinates = (stop.arrivalLatitude,
+                                stop.arrivalLongitude)
+            dis = distance.distance(
+                tracker_coordinates, stop_coordinates).m
+            if dis < 10:
+                upper_range = stop.arrivalTime + datetime.timedelta(0, 600)
+                lower_range = stop.arrivalTime - datetime.timedelta(0, 600)
+                if lower_range <= update.time <= upper_range:
+                    logger.info("delivery proof ok")
 
-#     # logger.info(ordered_travel_data)    ##########
+                    update = DeliveryMessage(
+                        ginc=trace.ginc,
+                        gsin=stop.gsin,
+                        delivery_time=update.time
+                    )
 
-#     complete_travel_data = PostProcess.associate_address(
-#         raw_travel_data, ordered_travel_data)
+                    new_travel_data = TomTomRecalculation.update_route(
+                        trace, update)
+                    ordered_travel_data = TomTomRecalculation.order_travel_data(
+                        new_travel_data)
 
-#     # logger.info(complete_travel_data)
+                    with open("./eta_to_notification_develop/zip_code.json") as cap_file:
+                        cap_delays = json.load(cap_file)
+                        logger.info(cap_delays)
 
-#     with open("./eta_to_notification_develop/zip_code.json") as cap_file:
-#         cap_delays = json.load(cap_file)
-#         logger.info(cap_delays)
+                    delay_travel_data = PostProcess.update_eta(
+                        ordered_travel_data, cap_delays, default_delay=int(os.getenv('DEFAULT_DELAY', 100)))
 
-#     delay_travel_data = PostProcess.update_eta(
-#         complete_travel_data, cap_delays, default_delay = os.getenv('DEFAULT_DELAY',100))
+                    stop = MessageSending.delivery_occurred_message(stop)
+                    logger.info(trace)
 
-#     message_sending = MessageSending.check_time_and_send(delay_travel_data)
+                    save_response = await FollowTrackDB.update_route_object(route_db, delay_travel_data)
+                    if save_response:
+                        logger.info("trace updated in db")
+                        return save_response
+                    else:
+                        logger.info("error in store trace inside db")
+                        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                            detail=f"error in store trace inside db")
 
-#     return delay_travel_data
+    return ('no proof of delivery')

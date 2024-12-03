@@ -3,10 +3,11 @@ import os
 import socket
 import threading
 
-from model.tracker_update import TrackerMessage
+from model.tracker import TrackerMessage
 from utils.tracker_update import TrackerUpdate
 from loguru import logger
 from parser import parse
+import datetime
 
 
 class SocketService():
@@ -34,18 +35,18 @@ class SocketService():
             data = connection.recv(1024)
             if not data:
                 break
-            logger.debug(f'Raw Bytes: {binascii.hexlify(data)}')
-            logger.debug(f'Current Thread: {cur_thread.name}')
+            # logger.debug(f'Raw Bytes: {binascii.hexlify(data)}')
+            # logger.debug(f'Current Thread: {cur_thread.name}')
             parsed_message = parse(data, address)
             # logger.info(parsed_message)
             if 'AVL_data' in parsed_message:
                 # logger.info(parsed_message['AVL_data'])
                 for data in parsed_message['AVL_data']:
-                    tracker_update = TrackerMessage(
-                        lat=data['GPS_element']['latitude'],
-                        long=data['GPS_element']['longitude'],
-                        time=data['timestamp']
-                    )
+                    tracker_update = TrackerMessage(**{
+                        "lat": data['GPS_element']['latitude'],
+                        "long": data['GPS_element']['longitude'],
+                        "time": datetime.datetime.fromtimestamp(data['timestamp']/1000).strftime('%Y-%m-%dT%H:%M:%SZ')
+                    })
                     logger.info(tracker_update)
                     update = TrackerUpdate.is_arrived(tracker_update)
                     logger.info(update)
