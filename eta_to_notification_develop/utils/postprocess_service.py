@@ -215,10 +215,8 @@ class PostProcess():
             first_stop = travel_data.stops[0]
             departure_address = first_stop.departureAddress
             departure_time = first_stop.departureTime
-            departure_gsin = first_stop.gsin
 
             csv_writer.writerow([
-                departure_gsin,
                 departure_address.address,
                 departure_address.city,
                 departure_address.district,
