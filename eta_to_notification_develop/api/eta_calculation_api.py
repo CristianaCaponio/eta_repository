@@ -79,7 +79,6 @@ async def create_upload_file(file: UploadFile,
 
     if save_response:
         logger.info("trace saved in db")
-        # system_response = PostProcess.create_response(delay_travel_data)
         csv_file = PostProcess.generate_csv(delay_travel_data)
         response = StreamingResponse(
             csv_file,
@@ -189,7 +188,7 @@ async def route_update(update: DeliveryMessage,
         ordered_travel_data, cap_delays, default_delay=int(os.getenv('DEFAULT_DELAY', 100)))
     # logger.info(f"travel_data delays after il Postprocess.update_eta are {delay_travel_data}")
 
-    message_sending = MessageSending.check_time_and_send(delay_travel_data)
+    MessageSending.check_time_and_send(delay_travel_data)
 
     ###########
     save_response = await FollowTrackDB.update_route_object(route_db, delay_travel_data)
@@ -206,6 +205,29 @@ async def route_update(update: DeliveryMessage,
 @eta_api_router.post("/tracker_update/", status_code=status.HTTP_200_OK)
 async def route_update(update: TrackerMessage,
                        route_db: AsyncIOMotorDatabase = ROUTE_DBDependency):
+    
+    """
+    Update the delivery status of a specific stop and recalculate route details.
+
+    Steps:
+    1. Retrieve the route data for the current date.
+    2. Iterate through the stops to find the next undelivered stop.
+    3. Check if the tracker is within the acceptable range of the stop location and time.
+    4. Update the stop as delivered and recalculate the route.
+    5. Adjust ETA using ZIP code delays.
+    6. Save the updated route in the database.
+
+    Args:
+        update (TrackerMessage): The tracker update information (latitude, longitude, and time).
+        route_db (AsyncIOMotorDatabase): Database connection for route operations.
+
+    Returns:
+        Response: The updated route response if saved successfully.
+        str: A message indicating no proof of delivery if criteria are not met.
+
+    Raises:
+        HTTPException: If an error occurs while saving the updated route to the database.
+    """
 
     date = datetime.datetime.now().strftime("%Y_%m_%d")
     trace_list = await FollowTrackDB.get_route_object_by_date(route_db, date)
@@ -243,7 +265,7 @@ async def route_update(update: TrackerMessage,
                     delay_travel_data = PostProcess.update_eta(
                         ordered_travel_data, cap_delays, default_delay=int(os.getenv('DEFAULT_DELAY', 100)))
 
-                    stop = MessageSending.delivery_occurred_message(stop)
+                    #stop = MessageSending.delivery_occurred_message(stop)
                     logger.info(trace)
 
                     save_response = await FollowTrackDB.update_route_object(route_db, delay_travel_data)

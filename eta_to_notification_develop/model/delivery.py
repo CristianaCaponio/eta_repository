@@ -10,7 +10,7 @@ class Address(BaseModel):
     district: str
     house_number: str
     zip_code: str
-    telephone_number: str  # "+3933332345678"
+    telephone_number: str  # "3933332345678"
 
 
 class Delivery(BaseModel):

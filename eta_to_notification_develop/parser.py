@@ -9,6 +9,17 @@ from memory import Memory
 def parse(packet: bytes, address):
     """
     Parses a packet and returns a dictionary with the parsed data.
+
+    Key Responsibilities:
+
+    1. **Packet Identification**: Determines whether the packet is an IMEI packet (17 bytes) or another type.
+    2. **IMEI Parsing**: If the packet is an IMEI, it decodes and maps the IMEI to a MAC address.
+    3. **Further Parsing**: If the packet is not an IMEI, it continues parsing other fields, such as MAC, codec ID, AVL data, and CRC.
+
+    Methods:
+
+    1. **Memory.add_to_memory**: If the packet is an IMEI packet, it maps the IMEI to a MAC address and stores it in the memory.
+    2. **Sub-parsers**: The packet is parsed further based on its structure using methods like get_AVL_data, get_IO_element, etc.
     """
     source_address = address[0] + ":" + str(address[1])
     # packet = binascii.hexlify(packet)
@@ -57,6 +68,19 @@ def parse(packet: bytes, address):
 
 
 def get_AVL_data(packet: bytes, CB: int, number_of_data_1: int = None):
+    """
+    This method extracts AVL data from the packet, which includes timestamps, priorities, GPS, and I/O elements.
+
+    Key Responsibilities:
+
+    1. **Data Extraction**: Iterates through the packet, extracting the AVL data items (timestamp, priority, GPS, I/O elements).
+    2. **Sub-parsers**: Calls other methods like get_GPS_element and get_IO_element to extract specific fields.
+
+    Methods:
+
+    1. **get_GPS_element**: Extracts GPS data (longitude, latitude, altitude, speed, etc.).
+    2. **get_IO_element**: Extracts I/O event data
+    """
     AVL_data = []
     for i in range(number_of_data_1):
         AVL_data_item = {}
@@ -73,6 +97,18 @@ def get_AVL_data(packet: bytes, CB: int, number_of_data_1: int = None):
 
 
 def get_IO_element(packet: bytes, CB: int):
+    """
+    This method parses the I/O event data from the packet.
+
+    Key Responsibilities:
+
+    1.**Extracting I/O Event Data**: Extracts details such as event IDs and the number of I/O entries for different byte sizes (1-byte, 2-byte, etc.).
+    2.**Sub-parsers**: Calls methods like get_one_byte_IO_list, get_two_byte_IO_list, etc., to further decode the I/O entries.
+
+    Methods:
+
+    1.**get_one_byte_IO_list, get_two_byte_IO_list, etc.**: These methods are responsible for parsing specific I/O entries based on their byte length.
+    """
     IO_element = {}
     IO_element['event_IO_ID'] = int.from_bytes(
         packet[CB:CB+2], byteorder='big')

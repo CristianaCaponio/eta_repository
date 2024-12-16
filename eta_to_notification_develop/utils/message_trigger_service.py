@@ -22,7 +22,7 @@ class MessageSending:
     @staticmethod
     def check_time_and_send(travel_data: TravelData):
         """
-        Checks if the arrival time of each stop is within one hour of the current time.
+        Checks if the arrival time of each stop is within 30 minutes of the current time.
         If it is, sends an SMS to notify the recipient of the imminent delivery.
 
         Args:
@@ -57,8 +57,8 @@ class MessageSending:
         logger.info(f"il token dell'api degli sms è {sms_token}")
         client = SmsApiComClient(access_token=sms_token)
 
-        with open('./eta_to_notification_develop/sms_deliver_errors.json') as deliver_errors:
-            error_codes = json.load(deliver_errors)
+        with open('./eta_to_notification_develop/sms_deliver_problems.json') as deliver_problems:
+            problem_codes = json.load(deliver_problems)
 
         for single_stop in travel_data.stops:
 
@@ -70,16 +70,18 @@ class MessageSending:
 
                 logger.info(f"messaggio a: {single_delivery.telephone_number}: la consegna è prevista per il giorno  {formatted_datetime}. Un nuovo messaggio sarà inviato quando saremo in prossimità del tuo indirizzo")  # nopep8
 
-                # response = client.sms.send(to = single_delivery.telephone_number, message = f"la consegna è prevista per il giorno  {formatted_datetime}. Un nuovo messaggio sarà inviato quando saremo in prossimità del tuo indirizzo",from_ = "Follow-Track")
+                # response = client.sms.send(to = single_delivery.telephone_number, 
+                #                            message = f"la consegna è prevista per il giorno  {formatted_datetime}. Un nuovo messaggio sarà inviato quando saremo in prossimità del tuo indirizzo",
+                #                            from_ = "Follow-Track")
 
-                # if response.status_code in error_codes.values():
-                #     for message, code in error_codes.items():
+                # if response.status_code in problem_codes.values():
+                #     for message, code in problem_codes.items():
                 #             if code == response.status_code:
-                #                 stop.message_report = f"Problema nell'invio del messaggio di arrivo a:  {single_delivery.telephone_number}: {message} "
-                #
+                #                 single_stop.message_report = f"Problema nell'invio del messaggio di arrivo a:  {single_delivery.telephone_number}: {message} "
+                
                 #             else:
-                #                 stop.message_report = f"messaggio di arrivo inviato a: {single_delivery.telephone_number}"
-                #
+                #                 single_stop.message_report = f"messaggio di arrivo inviato a: {single_delivery.telephone_number}"
+                
 
             except SendException as e:
                 single_stop.message_report = f"An exception during the sms deliver to  {
@@ -106,8 +108,8 @@ class MessageSending:
         client = SmsApiComClient(access_token=sms_token)
 
         formatted_datetime = stop.arrivalTime.strftime("%d/%m/%Y %H:%M:%S")
-        with open('./eta_to_notification_develop/sms_deliver_errors.json') as deliver_errors:
-            error_codes = json.load(deliver_errors)
+        with open('./eta_to_notification_develop/sms_deliver_problems.json') as deliver_problems:
+            problem_codes = json.load(deliver_problems)
 
         try:
 
@@ -115,10 +117,12 @@ class MessageSending:
                 logger.info(f"messaggio a: {stop.arrivalAddress.telephone_number}: la tua consegna è prevista nel seguente arco temporale:  {formatted_datetime} e {(stop.arrivalTime + timedelta(hours=1)).strftime('%d/%m/%Y %H:%M:%S')}")  # nopep8
                 stop.message_sent = True
                 return stop
-                # response = client.sms.send(to = stop.arrivalAddress.telephone_number, message = f"la tua consegna è prevista nel seguente arco temporale:  {formatted_datetime} e {(stop.arrivalTime + timedelta(hours=1)).strftime('%d/%m/%Y %H:%M:%S')},from_ = "Follow-Track")
+                # response = client.sms.send(to = stop.arrivalAddress.telephone_number, 
+                #                            message = f"la tua consegna è prevista nel seguente arco temporale:  {formatted_datetime} e {(stop.arrivalTime + timedelta(hours=1)).strftime('%d/%m/%Y %H:%M:%S')}",
+                #                            from_ = "Follow-Track")
 
-                # if response.status_code in error_codes.values():
-                #     for message, code in error_codes.items():
+                # if response.status_code in problem_codes.values():
+                #     for message, code in problem_codes.items():
                 #             if code == response.status_code:
                 #                 stop.message_report = f"Problema nell'invio del messaggio di consegna stimata a:  {stop.arrivalAddress.telephone_number}: {message} "
                 #                 stop.message_sent = False
@@ -149,8 +153,8 @@ class MessageSending:
         sms_token = os.getenv("SMS_DELIVERING")
         client = SmsApiComClient(access_token=sms_token)
 
-        with open('./eta_to_notification_develop/sms_deliver_errors.json') as deliver_errors:
-            error_codes = json.load(deliver_errors)
+        with open('./eta_to_notification_develop/sms_deliver_problems.json') as deliver_problems:
+            problem_codes = json.load(deliver_problems)
 
         try:
 
@@ -158,10 +162,12 @@ class MessageSending:
 
                 logger.info(f"messaggio a: {stop.arrivalAddress.telephone_number}: il tuo pacco è stato consegnato")  # nopep8
                 return stop
-                # response = client.sms.send(to = stop.arrivalAddress.telephone_number, message = f"il tuo pacco è stato consegnato",from_ = "Follow-Track")
+                # response = client.sms.send(to = stop.arrivalAddress.telephone_number, 
+                #                            message = f"il tuo pacco è stato consegnato",
+                #                            from_ = "Follow-Track")
 
-                # if response.status_code in error_codes.values():
-                #     for message, code in error_codes.items():
+                # if response.status_code in problem_codes.values():
+                #     for message, code in problem_codes.items():
                 #             if code == response.status_code:
                 #                 stop.message_report = f"Problema nell'invio del messaggio di avvenuta consegna a:  {stop.arrivalAddress.telephone_number}: {message} "
                 #                 return stop
