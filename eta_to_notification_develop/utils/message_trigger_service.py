@@ -68,26 +68,26 @@ class MessageSending:
 
                 single_delivery = single_stop.arrivalAddress
                 formatted_datetime = single_stop.arrivalTime.strftime("%d/%m/%Y %H:%M:%S")
-                logger.info(f"Messaggio inviato a: {single_delivery.telephone_number}. Il corriere è partito. La tua consegna è prevista per il giorno: {formatted_datetime} ")
+                # logger.info(f"Messaggio inviato a: {single_delivery.telephone_number}. Il corriere è partito. La tua consegna è prevista per il giorno: {formatted_datetime} ")
 
-                # response = client.sms.send(
-                #     to=single_delivery.telephone_number,
-                #     message=f"Il corriere è partito. La tua consegna è prevista nel seguente arco temporale: {formatted_datetime}}",
-                #     from_=""
-                # )
+                response = client.sms.send(
+                    to=single_delivery.telephone_number,
+                    message=f"Il corriere è partito. La tua consegna è prevista nel seguente arco temporale: {formatted_datetime}",
+                    from_=""
+                )
 
-                # for sms_result in response.results:
-                #     status = sms_result.status
-                #     logger.info(f"sms result for {single_delivery.telephone_number}: {status}")
+                for sms_result in response.results:
+                    status = sms_result.status
+                    logger.info(f"sms result for {single_delivery.telephone_number}: {status}")
 
-                #     if status in {"QUEUE", "SENT", "DELIVERED", "ACCEPTED"}:
-                #         single_stop.message_report = f"Messaggio di partenza corriere inviato a: {single_delivery.telephone_number}"
-                #     else:
-                #         error_message = next(
-                #             (msg for msg, code in statuses_codes.items() if code == sms_result.code),
-                #             "Errore sconosciuto"
-                #         )
-                #         single_stop.message_report = f"Problema nell'invio del messaggio a {single_delivery.telephone_number}: {error_message}"
+                    if status in {"QUEUE", "SENT", "DELIVERED", "ACCEPTED"}:
+                        single_stop.message_report = f"Messaggio di partenza corriere inviato a: {single_delivery.telephone_number}"
+                    else:
+                        error_message = next(
+                            (msg for msg, code in statuses_codes.items() if code == sms_result.code),
+                            "Errore sconosciuto"
+                        )
+                        single_stop.message_report = f"Problema nell'invio del messaggio a {single_delivery.telephone_number}: {error_message}"
 
             except SendException as e:
                 single_stop.message_report = f"Eccezione durante l'invio del messaggio di arrivo a {single_stop.arrivalAddress.telephone_number}: {e}"
@@ -117,33 +117,33 @@ class MessageSending:
         successful_statuses = {"QUEUE", "SENT", "DELIVERED", "ACCEPTED"}
 
         try:
-            logger.info(f"messaggio inviato a: {stop.arrivalAddress.telephone_number}. La tua consegna è prevista nel seguente arco temporale: {formatted_datetime} e {(stop.arrivalTime + timedelta(hours=1)).strftime('%d/%m/%Y %H:%M:%S')}")
-            return stop
-            # if not stop.message_sent and not stop.delivered:
-            #     response = client.sms.send(
-            #         to=stop.arrivalAddress.telephone_number,
-            #         message=f"La tua consegna è prevista nel seguente arco temporale: {formatted_datetime} e {(stop.arrivalTime + timedelta(hours=1)).strftime('%d/%m/%Y %H:%M:%S')}",
-            #         from_=""
-            #     )
+            # logger.info(f"messaggio inviato a: {stop.arrivalAddress.telephone_number}. La tua consegna è prevista nel seguente arco temporale: {formatted_datetime} e {(stop.arrivalTime + timedelta(hours=1)).strftime('%d/%m/%Y %H:%M:%S')}")
+            # return stop
+            if not stop.message_sent and not stop.delivered:
+                response = client.sms.send(
+                    to=stop.arrivalAddress.telephone_number,
+                    message=f"La tua consegna è prevista nel seguente arco temporale: {formatted_datetime} e {(stop.arrivalTime + timedelta(hours=1)).strftime('%d/%m/%Y %H:%M:%S')}",
+                    from_=""
+                )
 
-            #     for sms_result in response.results:
-            #         status = sms_result.status
-            #         logger.info(f"sms result for {stop.arrivalAddress.telephone_number}: {status}")
+                for sms_result in response.results:
+                    status = sms_result.status
+                    logger.info(f"sms result for {stop.arrivalAddress.telephone_number}: {status}")
 
-            #         if status in successful_statuses:
-            #             stop.message_report = f"Messaggio di consegna stimata inviato a: {stop.arrivalAddress.telephone_number}"
-            #             stop.message_sent = True
-            #             stop.delivered = True
-            #         else:
-            #             error_message = next(
-            #                 (msg for msg, code in statuses_codes.items() if code == sms_result.code),
-            #                 "Errore sconosciuto"
-            #             )
-            #             stop.message_report = f"Problema nell'invio del messaggio a {stop.arrivalAddress.telephone_number}: {error_message} (stato: {status})"
-            #             stop.message_sent = False
-            #             stop.delivered = False
+                    if status in successful_statuses:
+                        stop.message_report = f"Messaggio di consegna stimata inviato a: {stop.arrivalAddress.telephone_number}"
+                        stop.message_sent = True
+                        stop.delivered = True
+                    else:
+                        error_message = next(
+                            (msg for msg, code in statuses_codes.items() if code == sms_result.code),
+                            "Errore sconosciuto"
+                        )
+                        stop.message_report = f"Problema nell'invio del messaggio a {stop.arrivalAddress.telephone_number}: {error_message} (stato: {status})"
+                        stop.message_sent = False
+                        stop.delivered = False
 
-            #     return stop
+                return stop
 
         except SendException as e:
             stop.message_report = f"Eccezione durante l'invio del messaggio a {stop.arrivalAddress.telephone_number}: {e}"
