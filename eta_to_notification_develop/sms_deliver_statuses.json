@@ -1,0 +1,14 @@
+{
+    "401": "NOT_FOUND",
+    "402": "EXPIRED",
+    "403": "SENT",
+    "404": "DELIVERED",
+    "405": "UNDELIVERED",
+    "406": "FAILED",
+    "407": "REJECTED",
+    "408": "UNKNOWN",
+    "409": "QUEUE",
+    "410": "ACCEPTED",
+    "412": "STOP"
+  }
+  
