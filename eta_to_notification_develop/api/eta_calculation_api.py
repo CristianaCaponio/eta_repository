@@ -244,9 +244,11 @@ async def route_update(update: TrackerMessage,
                                 stop.arrivalLongitude)
             dis = distance.distance(
                 tracker_coordinates, stop_coordinates).m
-            if dis < 10:
+            logger.info(f'the distance from {stop.arrivalAddress} is {dis}')
+            if dis < 30:
                 upper_range = stop.arrivalTime + datetime.timedelta(0, 600)
                 lower_range = stop.arrivalTime - datetime.timedelta(0, 600)
+                logger.info(f'the time range is between {upper_range} and {lower_range} and the time is {update.time}')  # nopep8
                 if lower_range <= update.time <= upper_range:
                     logger.info("delivery proof ok")
 

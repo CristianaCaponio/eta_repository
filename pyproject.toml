@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "eta-to-notification"
-version = "1.0.9"
+version = "1.0.10"
 description = "this project calculates the ETA and sends an email when the ETA reaches a certain time treshold"
 authors = ["CristianaCaponio <cristiana.caponio@ngs-sensors.it>"]
 readme = "README.md"
