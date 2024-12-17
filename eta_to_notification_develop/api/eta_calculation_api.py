@@ -205,7 +205,6 @@ async def route_update(update: DeliveryMessage,
 @eta_api_router.post("/tracker_update/", status_code=status.HTTP_200_OK)
 async def route_update(update: TrackerMessage,
                        route_db: AsyncIOMotorDatabase = ROUTE_DBDependency):
-    
     """
     Update the delivery status of a specific stop and recalculate route details.
 
@@ -231,7 +230,11 @@ async def route_update(update: TrackerMessage,
 
     date = datetime.datetime.now().strftime("%Y_%m_%d")
     trace_list = await FollowTrackDB.get_route_object_by_date(route_db, date)
-    trace = trace_list[0]
+    if trace_list:
+        trace = trace_list[0]
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"route information not found.")
     # logger.info(trace)
     tracker_coordinates = (update.lat, update.long)
 
@@ -265,7 +268,7 @@ async def route_update(update: TrackerMessage,
                     delay_travel_data = PostProcess.update_eta(
                         ordered_travel_data, cap_delays, default_delay=int(os.getenv('DEFAULT_DELAY', 100)))
 
-                    #stop = MessageSending.delivery_occurred_message(stop)
+                    # stop = MessageSending.delivery_occurred_message(stop)
                     logger.info(trace)
 
                     save_response = await FollowTrackDB.update_route_object(route_db, delay_travel_data)
