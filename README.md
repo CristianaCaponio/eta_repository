@@ -15,7 +15,7 @@ https://github.com/smsapi/smsapi-python-client/tree/master/examples
 I singoli servizi
 
 Qui il link alla piattaforma
-http://localhost:8010/docs
+http://167.235.62.20:8010/docs
 
     1./follow_track_api/upload_route_file/ Create Upload File:
         Il servizio riceve in input un csv che deve essere necessariamente nominato nella seguente modalità: yyyy_mm_dd_idNumber (esempio: 2024_12_20_id001). Il file
@@ -33,7 +33,7 @@ http://localhost:8010/docs
        Le informazioni elaborate sono inserite nel database nel modello definito in "TravelData" e come ginc viene assegnato l'idNumber del file csv.
        Gli orari salvati in database sono in formato UTC+0
 
-       NB: il punto di partenza coincide anche con il punto di arrivo finale, per cui ottimizza il tragitto facendo in modo che il veicolo ritorni al punto di partenza. 
+       Nota: il punto di partenza coincide anche con il punto di arrivo finale, per cui il sistema ottimizza il tragitto facendo in modo che il veicolo ritorni al punto di partenza. 
        
     2./follow_track_api/get_route/ Get Route Object By Ginc
         Il servizio permette di visuaizzare un percorso salvato nel database prendendo in input il suo ginc
@@ -87,7 +87,7 @@ https://github.com/smsapi/smsapi-python-client/tree/master/examples
 Services
 
 Platform Link:
-http://localhost:8010/docs
+http://167.235.62.20:8010/docs
 
       1. /follow_track_api/upload_route_file/ Create Upload File:
             This service processes a CSV file, which must be named using the following format: yyyy_mm_dd_idNumber (e.g., 2024_11_20_id001). The file contains the daily route with the following details, found in the "Delivery" model:
