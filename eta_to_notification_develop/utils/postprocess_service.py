@@ -217,6 +217,7 @@ class PostProcess():
             departure_time = first_stop.departureTime
 
             csv_writer.writerow([
+                "start/ending point",
                 departure_address.address,
                 departure_address.city,
                 departure_address.district,

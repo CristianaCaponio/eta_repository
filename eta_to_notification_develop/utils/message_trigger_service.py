@@ -55,6 +55,10 @@ class MessageSending:
 
         Returns:
             TravelData: The updated object with the sending status for each stop.
+
+        On database:
+            The shipping status is saved in the "message_report" field (the list of statuses is contained in the "sms_deliver_statuses.json" file) or any error message
+            whose detailed explanation is contained in the "sms_deliver_error_list.json")
         """
         sms_token = os.getenv("SMS_DELIVERING")
         client = SmsApiComClient(access_token=sms_token)
@@ -107,6 +111,10 @@ class MessageSending:
 
         Returns:
             StopSummary: The updated stop object with the sending status.
+        
+        On database:
+            The shipping status is saved in the "message_report" field (the list of statuses is contained in the "sms_deliver_statuses.json" file) or any error message
+            whose detailed explanation is contained in the "sms_deliver_error_list.json")
         """
         sms_token = os.getenv("SMS_DELIVERING")
         client = SmsApiComClient(access_token=sms_token)
@@ -152,47 +160,50 @@ class MessageSending:
             return stop
                       
 
-    @staticmethod
-    def delivery_occurred_message(stop: StopSummary) -> StopSummary:
-        """
-        Sends an SMS confirming that the package has been delivered.
+    # @staticmethod
+    # def delivery_occurred_message(stop: StopSummary) -> StopSummary:
+    #     """
+    #     Sends an SMS confirming that the package has been delivered.
 
-        Args:
-            stop (StopSummary): Stop data containing the recipient's phone number and delivery confirmation.
+    #     Args:
+    #         stop (StopSummary): Stop data containing the recipient's phone number and delivery confirmation.
 
-        Returns:
-            StopSummary: The updated stop object with the sending status.
-        """
-        sms_token = os.getenv("SMS_DELIVERING")
-        client = SmsApiComClient(access_token=sms_token)
+    #     Returns:
+    #         StopSummary: The updated stop object with the sending status.
+    #     On database:
+    #         The shipping status is saved in the "message_report" field (the list of statuses is contained in the "sms_deliver_statuses.json" file) or any error message
+    #         whose detailed explanation is contained in the "sms_deliver_error_list.json")  
+    #     """
+    #     sms_token = os.getenv("SMS_DELIVERING")
+    #     client = SmsApiComClient(access_token=sms_token)
 
-        with open('./eta_to_notification_develop/sms_deliver_statuses.json') as deliver_statuses:
-            statuses_codes = json.load(deliver_statuses)
-        successful_statuses = {"QUEUE", "SENT", "DELIVERED", "ACCEPTED"}
+    #     with open('./eta_to_notification_develop/sms_deliver_statuses.json') as deliver_statuses:
+    #         statuses_codes = json.load(deliver_statuses)
+    #     successful_statuses = {"QUEUE", "SENT", "DELIVERED", "ACCEPTED"}
 
-        try:
-            response = client.sms.send(
-                to=stop.arrivalAddress.telephone_number,
-                message="Il tuo pacco è stato consegnato",
-                from_=""
-            )
+    #     try:
+    #         response = client.sms.send(
+    #             to=stop.arrivalAddress.telephone_number,
+    #             message="Il tuo pacco è stato consegnato",
+    #             from_=""
+    #         )
 
-            for sms_result in response.results:
-                status = sms_result.status
-                logger.info(f"Stato della risposta per {stop.arrivalAddress.telephone_number}: {status}")
+    #         for sms_result in response.results:
+    #             status = sms_result.status
+    #             logger.info(f"Stato della risposta per {stop.arrivalAddress.telephone_number}: {status}")
 
-                if status in successful_statuses:
-                    stop.message_report = f"Messaggio di avvenuta consegna inviato a: {stop.arrivalAddress.telephone_number}"
-                    return stop
-                else:
-                    error_message = next(
-                        (msg for msg, code in statuses_codes.items() if code == sms_result.code),
-                        "Errore sconosciuto"
-                    )
-                    stop.message_report = f"Problema nell'invio del messaggio di avvenuta consegna a: {stop.arrivalAddress.telephone_number}: {error_message}"
-                    return stop
+    #             if status in successful_statuses:
+    #                 stop.message_report = f"Messaggio di avvenuta consegna inviato a: {stop.arrivalAddress.telephone_number}"
+    #                 return stop
+    #             else:
+    #                 error_message = next(
+    #                     (msg for msg, code in statuses_codes.items() if code == sms_result.code),
+    #                     "Errore sconosciuto"
+    #                 )
+    #                 stop.message_report = f"Problema nell'invio del messaggio di avvenuta consegna a: {stop.arrivalAddress.telephone_number}: {error_message}"
+    #                 return stop
 
-        except SendException as e:
-            stop.message_report = f"Eccezione durante l'invio del messaggio di avvenuta consegna a {stop.arrivalAddress.telephone_number}: {e}"
+    #     except SendException as e:
+    #         stop.message_report = f"Eccezione durante l'invio del messaggio di avvenuta consegna a {stop.arrivalAddress.telephone_number}: {e}"
 
-        return stop
+    #     return stop
