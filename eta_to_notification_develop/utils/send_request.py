@@ -13,7 +13,7 @@ def from_object_to_json(informations: TrackerMessage):
     Funcion to convert a instance into a json
     Input:
         instance
-    Output: 
+    Output:
         Json
     """
 
@@ -30,7 +30,7 @@ def send_message(message: Dict) -> Response:
     """
     try:
         logger.debug("Sending POST request.")
-        url = "http://0.0.0.0:8010/follow_track_api/tracker_update/"
+        url = "http://*********:****/follow_track_api/tracker_update/"
         # payload = dumps(message)
         response = requests.post(url=url, data=message, headers={
                                  "Content-Type": "application/json"})

@@ -14,7 +14,7 @@ class SocketService():
     # creation of the socket
     ServerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host = socket.gethostname()  # Standard loopback interface address (localhost)
-    port = 4440
+    port = 0000
     logger.info(port)
 
     def __init__(self) -> None:

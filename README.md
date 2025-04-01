@@ -20,24 +20,24 @@ http://167.235.62.20:8010/docs
     1./follow_track_api/upload_route_file/ Create Upload File:
         Il servizio riceve in input un csv che deve essere necessariamente nominato nella seguente modalità: yyyy_mm_dd_idNumber (esempio: 2024_12_20_id001). Il file
         contiene il percorso giornaliero con le seguenti informazioni, rinvenibili all'interno del model "Delivery":
-        - gsin 
+        - gsin
         - address -> indirizzo senza cap e numero civico
         - city -> città
         - dictrict -> provincia
         - house_number -> numero civico
         - zip_code -> cap
         - telephone_number -> numero di telefono (in formato 39XXXXXXXXXX)
-       
+
        Il contenuto del csv viene elaborato con la chiamata a TomTom, a seguito della quale viene restituito un csv con l'indirizzo di partenza come punto iniziale, contrassegnato dalla dicitura "start/ending point", ed  il percorso ottimizzato con l'orario stimato di arrivo per ciascuna tappa (si presuppone che l'orario di parenza coincida sempre con quello della chiamata a TomTom), calcolato anche sulla base dei CAP inseriti nella lista "zip_code.json".
-       A tutti i destinatari viene inviato un sms con l'ora stimata di arrivo e se l'orario di ogni tappa è inferiore di 30 minuti rispetto a quello di partenza,  ai destinarari viene inviato un ulteriore sms contenente un range di orario per la consegna effettiva. 
+       A tutti i destinatari viene inviato un sms con l'ora stimata di arrivo e, se l'orario di ogni tappa è inferiore di 30 minuti rispetto a quello di partenza,  ai destinarari viene inviato un ulteriore sms contenente un range di orario per la consegna effettiva.
        Le informazioni elaborate sono inserite nel database nel modello definito in "TravelData" e come ginc viene assegnato l'idNumber del file csv.
        Gli orari salvati in database sono in formato UTC+0
 
-       Nota: il punto di partenza coincide anche con il punto di arrivo finale, per cui il sistema ottimizza il tragitto facendo in modo che il veicolo ritorni al punto di partenza. 
-       
+       Nota: il punto di partenza coincide anche con il punto di arrivo finale, per cui il sistema ottimizza il tragitto facendo in modo che il veicolo ritorni al punto di partenza.
+
     2./follow_track_api/get_route/ Get Route Object By Ginc
-        Il servizio permette di visuaizzare un percorso salvato nel database prendendo in input il suo ginc
-    
+        Il servizio permette di visualizzare un percorso salvato nel database prendendo in input il suo ginc
+
     3./follow_track_api/route_delete/ Delete Trace
         Il servizio permette di cancellare un intero percorso prendendo in input il suo ginc
 
@@ -46,18 +46,18 @@ http://167.235.62.20:8010/docs
         - ginc
         - gsin
         - delivery_time -> è già impostato all'orario della richiesta ed è in formato UTC
-        A seguito della chiamata, la fermata viene contrassegnata con delivered=True ed al destinatario viene inviato un messaggio di avvenuta consegna del pacco.  
-        Viene nuovamente chiamato il servizio di TomTom che, senza ottimizzare il percorso,  provvede ad aggiornare gli ETA e ad inviare le notifihe ai destinatari se l' orario di arrivo è inferiore di un'ora rispetto alla partenza. La risposta, contenuta nel modello "Response" contiene gli aggiornamenti del delivered=True,della chiamata a TomTom e dell'inoltro dei messaggi.
-        Il database viene aggiornato con i dati del nuovo ricalcolo e con la fermata contrassegnata spostata in una lista chiamata delivered_stops. 
+        A seguito della chiamata, la fermata viene contrassegnata con delivered=True ed al destinatario viene inviato un messaggio di avvenuta consegna del pacco.
+        Viene nuovamente chiamato il servizio di TomTom che, senza ottimizzare il percorso,  provvede ad aggiornare gli ETA e ad inviare le notifihe ai destinatari se l' orario di arrivo è inferiore di un'ora rispetto alla partenza. La risposta, contenuta nel modello "Response", riporta gli aggiornamenti del delivered=True, della chiamata a TomTom e dell'inoltro dei messaggi.
+        Il database viene aggiornato con i dati del nuovo ricalcolo e con la fermata contrassegnata spostata in una lista chiamata delivered_stops.
 
     5./follow_track_api/tracker_update/ Route Update
         Il servizio consente di aggiornare lo stato di consegna di una specifica tappa del percorso e di ricalcolare i dettagli della rotta.
-        Si identifica la rotta corrente recuperando dal database i seguenti dati: 
+        Si identifica la rotta corrente recuperando dal database i seguenti dati:
         -lat
         -long
         -time
         Quest'ulimo, in particolare, è in formato stringa perchè il tracker inoltra l'orario sotto forma di stringa avente una struttura simile a quella di un datetime (ad esempio 2024-12-16T14:49:57.000+00:00).
-        
+
         Con questi dati si verifica  che il tracker sia:
         - entro 30 metri dalla posizione della tappa non ancora consegnata.
         - all'interno di un range temporale di ±20 minuti rispetto all'orario programmato per la consegna.
@@ -94,17 +94,17 @@ http://167.235.62.20:8010/docs
 
             -gsin
             -address -> address without ZIP code or house number
-            -city 
-            -district 
-            -house_number 
-            -zip_code 
+            -city
+            -district
+            -house_number
+            -zip_code
             -telephone_number -> phone number in the format 39XXXXXXXXXX
 
             The CSV content is processed through a call to TomTom, which returns a CSV file with the starting address as the initial point, marked with the label "start/ending point," and the optimized route with the estimated arrival time for each stop (it is assumed that the departure time always coincides with the time of the call to TomTom), calculated based on the ZIP codes provided in the "zip_code.json" list.
 
-            All recipients receive an SMS with the estimated arrival time, and if the time for any stop is less than 30 minutes earlier than the departure time, an additional SMS is sent to the recipients containing a time range for the actual delivery. 
+            All recipients receive an SMS with the estimated arrival time, and if the time for any stop is less than 30 minutes earlier than the departure time, an additional SMS is sent to the recipients containing a time range for the actual delivery.
 
-            The processed information is stored in the database in the model defined in "TravelData," and the CSV file's idNumber is assigned as the ginc.  
+            The processed information is stored in the database in the model defined in "TravelData," and the CSV file's idNumber is assigned as the ginc.
             The times saved in the database are in UTC+0 format.
 
             Note: The starting point also coincides with the final endpoint, so the route is optimized to ensure the vehicle returns to the starting point.

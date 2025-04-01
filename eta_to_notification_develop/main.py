@@ -25,7 +25,7 @@ app = FastAPI(title=settings.project_name,
 app.include_router(eta_api_router, prefix=api_prefix)
 
 origins = [
-    "http://localhost:8010",
+    "http://localhost:****",
 ]
 
 app.add_middleware(
@@ -35,26 +35,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# consumer_settings = {
-#     "bootstrap.servers": os.environ.get('BOOTSTRAP_SERVERS', 'localhost:9092'),
-#     "group.id": "RT-Controller-fleetone",
-#     # <-------------------------- check this line
-#     "heartbeat.interval.ms": os.environ.get('HEARTBEAT_INTERVAL_MS', 6000)
-#     # "value.deserializer": "io.confluent.kafka.serializers.KafkaJsonDeserializer"
-# }
-# consumer_settings_ = ConsumerSettings(**consumer_settings)
-
-# producer_settings = {
-#     "bootstrap.servers": os.environ.get('BOOTSTRAP_SERVERS', 'localhost:9092'),
-#     "message.max.bytes": os.environ.get('MESSAGE_MAX_BYTES', 900485760),
-#     "compression.type": os.environ.get('COMPRESSION_TYPE', 'gzip')
-# }
-
-
-# application_conf = {
-#     'input.topic': os.environ.get('INPUT_TOPIC_NAME', 'eta_calculation')
-# }
 
 def socket_thread():
     ngs_socket = SocketService()
@@ -87,21 +67,6 @@ async def startup_event() -> None:
     process = multiprocessing.Process(target=socket_thread, args=())
     process.start()
     app.state.all_processes.append(process)
-
-    # ----------------------------------------------------------------------------------
-
-    # app.state.kafka_controller = KafkaController(
-    #     {"bootstrap.servers": os.environ.get('BOOTSTRAP_SERVERS', 'localhost:9092')})
-    # app.state.kafka_controller.create_topic(application_conf['input.topic'])
-
-    # logger.info("Starting up. Initializing Database, producer, and consumer")
-    # app.state.producer = AIOProducer(producer_settings)
-    # app.state.consumer = AIOConsumer(configs=consumer_settings_,
-    #                                  topics=[
-    #                                      application_conf['input.topic'],
-    #                                      'FLEETONE'],
-    #                                  db=rt_db,
-    #                                  producer=app.state.producer)
 
     app.state.route_db = route_db
     logger.info("Follow Track service ready.")

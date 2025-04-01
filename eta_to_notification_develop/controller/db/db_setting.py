@@ -12,16 +12,16 @@ class ROUTE_DBSettings():
     Settings class for database connection
     """
 
-    domain = os.environ.get('DB_DOMAIN', 'ngs-sensors.it')
+    domain = os.environ.get('DB_DOMAIN', '_______')
     mongo_base_url = f"database.{domain}"
-    mongo_port = str(os.environ.get('DB_MONGO_PORT', 27017))
-    mongo_nodes = int(os.environ.get('DB_MONGO_NODES', 3))
+    mongo_port = str(os.environ.get('DB_MONGO_PORT', 00000))
+    mongo_nodes = int(os.environ.get('DB_MONGO_NODES', 0))
     hosts = []
     username = os.environ.get('DB_USERNAME')
     password = os.environ.get('DB_PASSWORD')
     database = os.environ.get('DB_DATABASE')
-    auth_source = os.environ.get('DB_AUTH_SOURCE', 'admin')
-    replica_set = os.environ.get('DB_REPLICA_SET', 'ngs-mongo-replica')
+    auth_source = os.environ.get('DB_AUTH_SOURCE', '______')
+    replica_set = os.environ.get('DB_REPLICA_SET', '______')
     read_preference = 'primary'
     connection_uri = ""
     integration_test = os.environ.get('INTEGRATION_TEST', False)

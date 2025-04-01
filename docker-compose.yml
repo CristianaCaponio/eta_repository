@@ -9,15 +9,15 @@ services:
       context: .
       dockerfile: Dockerfile
       target: main-image
-    # networks: 
+    # networks:
     #   - default
     ports:
-      - "8010:8010"
-      - "4440:4440"
+      - "0000:0000"
+      - "0000:0000"
     env_file: ./eta_to_notification.env
     #network_mode: host
 
-    # networks: 
-    #   default: 
+    # networks:
+    #   default:
     #     external: true
     #     name: confluent_default
