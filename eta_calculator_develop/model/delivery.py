@@ -1,9 +1,9 @@
 from typing import List
-from model.base_model import BaseModel
+from pydantic import BaseModel
 
 
 class Address(BaseModel):
-    '''This class defines the parameters for an address. The address will be converted into coordinates 
+    '''This class defines the parameters for an address. The address will be converted into coordinates
     by a function hosted preprocess_service and used to populate TravelData object. The fields must be strings (str).'''
     address: str
     city: str

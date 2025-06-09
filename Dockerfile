@@ -26,15 +26,13 @@ RUN rm -rf /var/lib/apt/lists/*
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 
-FROM runner-image as test-image
+FROM runner-image AS test-image
 WORKDIR /usr/src/app
 COPY pyproject.toml .
 COPY poetry.lock .
-#RUN poetry config http-basic.iot-device-datamodel iot-platform-datamodel.poetry GwpKXE1DjVB-AepvgtfP && poetry install --no-root
 COPY . .
 RUN poetry install
-#RUN ./.venv/bin/pip install user-management --extra-index-url https://__token__:glpat-uMWfuWF7LZvE-y8yvor7@gitlab.ngs-sensors.it:4443/api/v4/projects/132/packages/pypi/simple
 
 
-FROM test-image as main-image
-CMD ["poetry", "run", "python", "eta_to_notification_develop/main.py"]
+FROM test-image AS main-image
+CMD ["poetry", "run", "python", "eta_calculator_develop/main.py"]

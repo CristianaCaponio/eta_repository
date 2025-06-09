@@ -10,15 +10,15 @@ import os
 class TomTom:
     """
     The TomTom class provides methods for interacting with the TomTom Routing API to calculate optimal routes
-    and estimate travel times. It retrieves route details, including distance, time, traffic conditions, and 
+    and estimate travel times. It retrieves route details, including distance, time, traffic conditions, and
     stop information, and processes this data into a structured `TravelData` object.
 
     Key Responsibilities:
     1. Generate API request strings to interact with TomTom's routing service.
     2. Make requests to the TomTom API to obtain routing information in JSON format.
-    3. Parse the response from TomTom to extract useful information like route details, stop information, 
+    3. Parse the response from TomTom to extract useful information like route details, stop information,
        and estimated travel times.
-    4. Populate a `TravelData` object with the parsed route and stop details, which can then be used for 
+    4. Populate a `TravelData` object with the parsed route and stop details, which can then be used for
        further processing or display.
     """
 
@@ -192,9 +192,7 @@ class TomTom:
                 arrivalLatitude=tomtom_arrival_latitude,
                 arrivalLongitude=tomtom_arrival_longitude,
                 trafficLengthInMeters=leg_data["summary"]["trafficLengthInMeters"],
-                # leg_data["summary"]["departureTime"],
                 departureTime=departure_time_iso,
-                # leg_data["summary"]["arrivalTime"],
                 arrivalTime=arrival_time_iso,
                 delivered=False
             )

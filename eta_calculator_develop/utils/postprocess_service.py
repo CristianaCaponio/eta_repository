@@ -10,8 +10,8 @@ import csv
 
 class PostProcess():
     """
-    The `PostProcess` class contains functionality to process travel data after the main processing step. 
-    It is responsible for associating addresses to the travel data, updating estimated times of arrival (ETAs), 
+    The `PostProcess` class contains functionality to process travel data after the main processing step.
+    It is responsible for associating addresses to the travel data, updating estimated times of arrival (ETAs),
     and preparing the final response with the necessary delivery information.
 
     Key Responsibilities:
@@ -26,7 +26,7 @@ class PostProcess():
         """
         This method associates the delivery addresses to the stops in the ordered travel data based on geographic proximity.
 
-        It compares the departure and arrival locations of each stop in `raw_travel_data` with the corresponding stops in `ordered_travel_data`, 
+        It compares the departure and arrival locations of each stop in `raw_travel_data` with the corresponding stops in `ordered_travel_data`,
         calculating the distance between them. The closest match is used to assign the correct address to each stop.
 
         Args:
@@ -80,7 +80,7 @@ class PostProcess():
         """
         Adds a delay to the provided time object by a specified number of seconds.
 
-        This method is useful for adjusting the estimated times of arrival (ETA) for each stop based on delays 
+        This method is useful for adjusting the estimated times of arrival (ETA) for each stop based on delays
         due to factors like traffic or processing times.
 
         Args:
@@ -99,7 +99,7 @@ class PostProcess():
         """
         Updates the ETAs for each stop in the travel data, considering delays based on zip code.
 
-        The method checks the delay for each stop based on its zip code and adds it to both the departure and arrival times. 
+        The method checks the delay for each stop based on its zip code and adds it to both the departure and arrival times.
         If no specific delay is found for a zip code, a default delay is applied.
 
         Args:
@@ -118,7 +118,6 @@ class PostProcess():
 
         for i in range(len(travel_data.stops)-1):
             zip_code = travel_data.stops[i+1].departureAddress.zip_code
-            # delay = zip_code_delay[f"{zip_code}"]
             delay = zip_code_delay.get(zip_code, default_delay)
 
             for y in range(i+1, len(travel_data.stops)):
@@ -137,8 +136,8 @@ class PostProcess():
         """
         Processes the stops in the travel data to create a list of `Delivery_ETA` objects.
 
-        This method constructs a `Delivery_ETA` object for each stop, containing the delivery information 
-        (such as GSIN, address, ETA, and delivery status). The resulting list can be used for reporting or 
+        This method constructs a `Delivery_ETA` object for each stop, containing the delivery information
+        (such as GSIN, address, ETA, and delivery status). The resulting list can be used for reporting or
         generating responses for external systems.
 
         Args:
@@ -169,29 +168,29 @@ class PostProcess():
                     f"Error during Delivery_ETA creation for {stop}: {e}")
         return result
 
-    @staticmethod
-    def create_response(travel_data: TravelData) -> Response:
-        """
-        Creates a structured `Response` object containing the travel data and delivery ETA information.
+    # @staticmethod
+    # def create_response(travel_data: TravelData) -> Response:
+    #     """
+    #     Creates a structured `Response` object containing the travel data and delivery ETA information.
 
-        This method aggregates the processed delivery ETAs into a response format that can be sent to clients 
-        or used by other services. The response includes the travel summary, personal ID, GINC, and a list of 
-        `Delivery_ETA` objects.
+    #     This method aggregates the processed delivery ETAs into a response format that can be sent to clients
+    #     or used by other services. The response includes the travel summary, personal ID, GINC, and a list of
+    #     `Delivery_ETA` objects.
 
-        Args:
-            travel_data (TravelData): The travel data containing delivery stop details.
+    #     Args:
+    #         travel_data (TravelData): The travel data containing delivery stop details.
 
-        Returns:
-            Response: A structured response object containing the travel and delivery ETA data.
-        """
-        delivery = PostProcess.process_stops(travel_data)
+    #     Returns:
+    #         Response: A structured response object containing the travel and delivery ETA data.
+    #     """
+    #     delivery = PostProcess.process_stops(travel_data)
 
-        response = Response(**{
-            'ginc': travel_data.ginc,
-            'personal_id': travel_data.personal_id,
-            'delivery': delivery
-        })
-        return response
+    #     response = Response(**{
+    #         'ginc': travel_data.ginc,
+    #         'personal_id': travel_data.personal_id,
+    #         'delivery': delivery
+    #     })
+    #     return response
 
     @staticmethod
     def generate_csv(travel_data: TravelData) -> StringIO:

@@ -1,11 +1,2 @@
-
-# ssh key for devcontainer
-.ssh
-
-#.devcontainer
-.devcontainer
-devcontainer.*
-devcontainer.json
-
 #env
 *.env

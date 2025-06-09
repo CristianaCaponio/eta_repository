@@ -1,5 +1,4 @@
 import requests
-from utils.message_trigger_service import MessageSending
 from model.travel_data import TravelData
 from model.device_message import DeliveryMessage
 from datetime import datetime
@@ -9,16 +8,16 @@ import pytz
 
 class TomTomRecalculation:
     """
-    This class is responsible for recalculating the route for a specific travel based on updated delivery status 
+    This class is responsible for recalculating the route for a specific travel based on updated delivery status
     and coordinates. It interacts with the TomTom API to fetch the updated route and estimated times of arrival (ETAs).
-    
+
     Key Responsibilities:
     1. Updating travel data with the delivery status and recalculating the route.
     2. Making requests to the TomTom API to get route details, wxcepting for the computation of the best route order.
     3. Parsing the response from TomTom to update the travel data and stop details with accurate ETAs.
     4. Updating the status of delivered stops and reordering the route accordingly.
     """
-    
+
     @staticmethod
     def order_travel_data(travel_data: TravelData) -> TravelData:
         """
@@ -29,13 +28,13 @@ class TomTomRecalculation:
         2. If undelivered stops exist, updates the travel data and calls TomTom's API.
         3. Recalculates the route using TomTom’s services.
         4. Adjusts the ETA based on the updated route data.
-        
+
         Args:
             travel_data (TravelData): The travel data containing the current route and stops.
-        
+
         Returns:
             TravelData: The updated travel data with new ETAs and route details.
-        
+
         Raises:
             Exception: If no undelivered stops are found or an issue occurs during request/response handling.
         """
@@ -80,7 +79,7 @@ class TomTomRecalculation:
                     departure_coordinates = [
                         single_stop.departureLatitude, single_stop.departureLongitude]
                     logger.info(f"the departure coordinate is {departure_coordinates}")  # nopep8
-                   
+
                 arrival_coordinates.append(
                     [single_stop.arrivalLatitude, single_stop.arrivalLongitude])
 
@@ -214,10 +213,9 @@ class TomTomRecalculation:
         for stop in travel_data.stops:
             if stop.gsin == gsin:
                 if stop.delivered is False:
-                  
-                    stop.delivered_at = delivered_at            
+
+                    stop.delivered_at = delivered_at
                     stop.delivered = True
-                    MessageSending.delivery_occurred_message(stop)
                 else:
                     logger.info(
                         "not possible to update route file, shipment already delivered")
@@ -251,7 +249,7 @@ class TomTomRecalculation:
         Returns:
             TravelData: The updated travel data with delivered stops moved to `delivered_stops`.
         """
-        
+
         for stop in travel_data.stops:
             if stop.delivered:
                 travel_data.delivered_stops.append(stop)

@@ -5,14 +5,12 @@ from model.delivery import Delivery
 from fastapi import FastAPI, APIRouter, status, UploadFile, HTTPException
 from utils.preprocess_service import PreProcess
 from utils.postprocess_service import PostProcess
-from utils.message_trigger_service import MessageSending
 from model.travel_data import TravelData
-from model.response import Response
+from controller.db.eta_calculator_db import EtaDb
 from model.device_message import DeliveryMessage
-from model.tracker import TrackerMessage
-from controller.db.follow_track_db import FollowTrackDB
+from model.response import Response
+
 from loguru import logger
-from geopy import distance
 import json
 import os
 from motor.motor_asyncio import AsyncIOMotorDatabase
@@ -20,7 +18,7 @@ from fastapi.responses import StreamingResponse
 from controller.db.db_setting import ROUTE_DBDependency
 import datetime
 
-eta_api_router = APIRouter(tags=["Eta-To-Notification"])
+eta_api_router = APIRouter(tags=["Eta-Calculator"])
 
 app = FastAPI()
 
@@ -52,8 +50,7 @@ async def create_upload_file(file: UploadFile,
     delivery_list, date, trace_id = await PreProcess.digest_csv(file)
     logger.info(f'il trace_id è {trace_id}')
 
-    route = await FollowTrackDB.get_route_object(route_db, trace_id)
-    # logger.info(f'il route è {route}')
+    route = await EtaDb.get_route_object(route_db, trace_id)
 
     if route or route is None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
@@ -73,9 +70,8 @@ async def create_upload_file(file: UploadFile,
         complete_travel_data, cap_delays, default_delay=int(os.getenv('DEFAULT_DELAY', 100)))
     delay_travel_data.ginc = trace_id
     # logger.info(delay_travel_data)
-    MessageSending.delivery_departure_message(delay_travel_data)
-    MessageSending.check_time_and_send(delay_travel_data)
-    save_response = await FollowTrackDB.add_new_object(route_db, delay_travel_data)
+
+    save_response = await EtaDb.add_new_object(route_db, delay_travel_data)
 
     if save_response:
         logger.info("trace saved in db")
@@ -108,7 +104,7 @@ async def get_route_object_by_ginc(ginc: str,
         HTTPException: If the route is not found (404).
     """
 
-    route = await FollowTrackDB.get_route_object(route_db, ginc)
+    route = await EtaDb.get_route_object(route_db, ginc)
 
     if route and route is not None:
         return route[0]
@@ -134,7 +130,7 @@ async def delete_trace(ginc: str,
         HTTPException: If an error occurs during the deletion process (500).
     """
 
-    delete = await FollowTrackDB.delete_route_object(route_db, ginc)
+    delete = await EtaDb.delete_route_object(route_db, ginc)
 
     if delete:
         logger.info(f"object with ginc:{ginc} deleted")
@@ -168,7 +164,7 @@ async def route_update(update: DeliveryMessage,
         HTTPException: If the route is not found (404) or if an error occurs during saving (500).
     """
 
-    list_travel_data = await FollowTrackDB.get_route_object(route_db, update.ginc)
+    list_travel_data = await EtaDb.get_route_object(route_db, update.ginc)
     old_travel_data = list_travel_data[0]
 
     if not old_travel_data or old_travel_data is None:
@@ -188,10 +184,8 @@ async def route_update(update: DeliveryMessage,
         ordered_travel_data, cap_delays, default_delay=int(os.getenv('DEFAULT_DELAY', 100)))
     # logger.info(f"travel_data delays after il Postprocess.update_eta are {delay_travel_data}")
 
-    MessageSending.check_time_and_send(delay_travel_data)
-
     ###########
-    save_response = await FollowTrackDB.update_route_object(route_db, delay_travel_data)
+    save_response = await EtaDb.update_route_object(route_db, delay_travel_data)
     if save_response:
         logger.info("trace updated in db")
         response = PostProcess.create_response(delay_travel_data)
@@ -202,84 +196,3 @@ async def route_update(update: DeliveryMessage,
                             detail=f"error in store trace inside db")
 
 
-@eta_api_router.post("/tracker_update/", status_code=status.HTTP_200_OK)
-async def route_update(update: TrackerMessage,
-                       route_db: AsyncIOMotorDatabase = ROUTE_DBDependency):
-    """
-    Update the delivery status of a specific stop and recalculate route details.
-
-    Steps:
-    1. Retrieve the route data for the current date.
-    2. Iterate through the stops to find the next undelivered stop.
-    3. Check if the tracker is within the acceptable range of the stop location and time.
-    4. Update the stop as delivered and recalculate the route.
-    5. Adjust ETA using ZIP code delays.
-    6. Save the updated route in the database.
-
-    Args:
-        update (TrackerMessage): The tracker update information (latitude, longitude, and time).
-        route_db (AsyncIOMotorDatabase): Database connection for route operations.
-
-    Returns:
-        Response: The updated route response if saved successfully.
-        str: A message indicating no proof of delivery if criteria are not met.
-
-    Raises:
-        HTTPException: If an error occurs while saving the updated route to the database.
-    """
-
-    date = datetime.datetime.now().strftime("%Y_%m_%d")
-    trace_list = await FollowTrackDB.get_route_object_by_date(route_db, date)
-    if trace_list:
-        trace = trace_list[0]
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"route information not found.")
-    # logger.info(trace)
-    tracker_coordinates = (update.lat, update.long)
-
-    for stop in trace.stops:
-        if not stop.delivered:
-            stop_coordinates = (stop.arrivalLatitude,
-                                stop.arrivalLongitude)
-            dis = distance.distance(
-                tracker_coordinates, stop_coordinates).m
-            logger.info(f'the distance from {stop.arrivalAddress} is {dis}')
-            if dis < 30:
-                upper_range = stop.arrivalTime + datetime.timedelta(0, 1200)
-                lower_range = stop.arrivalTime - datetime.timedelta(0, 1200)
-                logger.info(f'the time range is between {upper_range} and {lower_range} and the time is {update.time}')  # nopep8
-                if lower_range <= update.time <= upper_range:
-                    logger.info("delivery proof ok")
-
-                    update = DeliveryMessage(
-                        ginc=trace.ginc,
-                        gsin=stop.gsin,
-                        delivery_time=update.time
-                    )
-
-                    new_travel_data = TomTomRecalculation.update_route(
-                        trace, update)
-                    ordered_travel_data = TomTomRecalculation.order_travel_data(
-                        new_travel_data)
-
-                    with open("./eta_to_notification_develop/zip_code.json") as cap_file:
-                        cap_delays = json.load(cap_file)
-                        logger.info(cap_delays)
-
-                    delay_travel_data = PostProcess.update_eta(
-                        ordered_travel_data, cap_delays, default_delay=int(os.getenv('DEFAULT_DELAY', 100)))
-
-                    # stop = MessageSending.delivery_occurred_message(stop)
-                    logger.info(trace)
-
-                    save_response = await FollowTrackDB.update_route_object(route_db, delay_travel_data)
-                    if save_response:
-                        logger.info("trace updated in db")
-                        return save_response
-                    else:
-                        logger.info("error in store trace inside db")
-                        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                                            detail=f"error in store trace inside db")
-
-    return ('no proof of delivery')

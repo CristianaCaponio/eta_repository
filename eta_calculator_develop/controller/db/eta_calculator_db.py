@@ -11,7 +11,7 @@ from datetime import datetime
 COLLECTION_NAME = os.environ.get('DB_COLLECTION', 'route_object')
 
 
-class FollowTrackDB(object):
+class EtaDb(object):
 
     @staticmethod
     async def add_new_object(db: AsyncIOMotorDatabase, route_objet) -> bool:
@@ -67,7 +67,7 @@ class FollowTrackDB(object):
     @staticmethod
     async def delete_route_object(db: AsyncIOMotorDatabase, ginc: str) -> bool:
         '''
-        delete 
+        delete
         '''
         try:
             result = await delete_entry(db, COLLECTION_NAME, {'ginc': ginc})

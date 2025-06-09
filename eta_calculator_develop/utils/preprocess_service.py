@@ -106,7 +106,7 @@ class PreProcess():
             ValueError: If any address cannot be geocoded.
         """
 
-        request = os.environ.get("USER_AGENT", "_______")
+        request = os.environ.get("USER_AGENT", "eta_calculato")
         geolocator = ArcGIS(user_agent=request)
         geocode = RateLimiter(geolocator.geocode,
                               min_delay_seconds=1, max_retries=10)
